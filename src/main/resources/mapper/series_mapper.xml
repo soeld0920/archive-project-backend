@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--todo : user 변경 시 이 mapper도 업데이트 해야함-->
+<mapper namespace="com.archive.archive_project_backend.repository.SeriesMapper">
+    <resultMap id="userMap" type="com.archive.archive_project_backend.entity.Series">
+        <id property="seriesUuid" column="series_uuid"/>
+    </resultMap>
+
+    <!--   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+
+    <select id="getSeriesByUuid" resultMap="userMap">
+        select
+            series_uuid
+        from
+            series
+        where
+            series_uuid = #{uuid}
+    </select>
+</mapper>

@@ -1,0 +1,16 @@
+spring:
+  profiles :
+    active: common # 현재 사용할 프로필 설정
+    group: # 프로필이 실핼할 깨 같이 실행하게끔 그룹을 지어줄 수 있음
+      common : secret # common이 실행하면 이거도 실행
+---
+spring:
+  config:
+    active:
+      on-profile: common # 이 블록은 common 프로필
+  application:
+    name: spring-boot-study
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml #mapper의 경로 지정
+  type-aliases-package: com.archive.archive_project_backend.entity #entity의 경로 지정

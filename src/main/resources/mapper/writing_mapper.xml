@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archive.archive_project_backend.repository.WritingMapper">
+
+    <resultMap id="series" type="com.archive.archive_project_backend.entity.Series">
+
+    </resultMap>
+
+    <resultMap id="user" type="com.archive.archive_project_backend.entity.User">
+
+    </resultMap>
+
+    <resultMap id="category" type="com.archive.archive_project_backend.entity.Category">
+
+    </resultMap>
+
+    <resultMap id="writingMap" type="com.archive.archive_project_backend.entity.Writing">
+        <id property="writingUuid" column="writing_uuid"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="view" column="view"/>
+        <result property="great" column="great"/>
+        <result property="createAt" column="create_at"/>
+        <result property="updateAt" column="update_at"/>
+        <association property="series" resultMap="series"/>
+        <association property="author" resultMap="user"/>
+        <association property="category" resultMap="category"/>
+        <collection property="tag" javaType="list"/>
+    </resultMap>
+
+
+<!--   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+
+
+    <insert id="insertWriting">
+        insert into
+            writing(writing_uuid, title, content, series_uuid, author_uuid, category_id, create_at, update_at)
+        values
+            (#{writingUuid}, #{title},#{content},#{series.seriesUuid},#{author.userUuid},
+            #{category.categoryId},now(),now())
+    </insert>
+
+    <select id="selectWritingByUuid" resultMap="writingMap">
+        select
+
+        from
+            writing w
+        left join user u on w.author_uuid = u.user_uuid
+        left join category_view c on w.category_id = c.category_id
+        left join series s on s.series_uuid = w.series_uuid
+
+    </select>
+</mapper>
