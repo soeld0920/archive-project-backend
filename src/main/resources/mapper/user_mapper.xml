@@ -14,6 +14,14 @@
         <association property="role" column="role_name" javaType="string"/>
     </resultMap>
 
+    <resultMap id="userLoginMap" type="com.archive.archive_project_backend.entity.UserLogin">
+        <id property="userLoginId" column="user_login_id"/>
+        <result property="userid" column="userid"/>
+        <result property="passwd" column="passwd"/>
+        <result property="userUuid" column="user_info_uuid"/>
+        <result property="createAt" column="create_at"/>
+        <result property="updateAt" column="update_at"/>
+    </resultMap>
     <!--   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
     <select id="getUserByUuid" resultMap="userMap">
@@ -49,6 +57,34 @@
         on ul.user_info_uuid = ui.user_info_uuid
         where
             ul.userid = #{userid}
+    </select>
+
+    <select id="getUserLoginById" resultMap="userLoginMap">
+        select
+            user_login_id,
+            userid,
+            passwd,
+            user_info_uuid,
+            create_at,
+            update_at
+        from
+            user_login
+        where
+            user_login_id = #{id}
+    </select>
+
+    <select id="selectUserLoginByUserid" resultMap="userLoginMap">
+        select
+            user_login_id,
+            userid,
+            passwd,
+            user_info_uuid,
+            create_at,
+            update_at
+        from
+            user_login
+        where
+            userid = #{userid}
     </select>
 
     <insert id="insertUserInfo">

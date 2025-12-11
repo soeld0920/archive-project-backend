@@ -4,8 +4,8 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class SignupException extends LoginException {
-    public SignupException(String message, HttpStatus httpStatus){
+public class SigninException extends LoginException {
+    public SigninException(String message, HttpStatus httpStatus){
         super(message, httpStatus);
     }
 }

@@ -81,5 +81,14 @@ public class JwtUtil {
         return header.substring(JwtConstants.BEARER.length());
     }
 
+    //refresh 타입 체크
+    public boolean isRefreshToken(String token){
+        try{
+            String type = getClaims(token).get("type", String.class);
 
+            return type.equals(JwtConstants.REFRESH);
+        }catch(Exception e){
+            return false;
+        }
+    }
 }

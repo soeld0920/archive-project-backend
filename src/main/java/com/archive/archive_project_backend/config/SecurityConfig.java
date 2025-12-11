@@ -75,7 +75,7 @@ public class SecurityConfig {
 
         //url 권한 설정
         http.authorizeHttpRequests(auth -> {
-            auth.requestMatchers("/user/**").permitAll();
+            auth.requestMatchers("/api/**").permitAll();
             auth.anyRequest().authenticated();
         });
 

@@ -1,11 +1,9 @@
 package com.archive.archive_project_backend.exception.login;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-@Getter
-public class SignupException extends LoginException {
-    public SignupException(String message, HttpStatus httpStatus){
+public class RefreshTokenException extends LoginException {
+    public RefreshTokenException(String message, HttpStatus httpStatus){
         super(message, httpStatus);
     }
 }

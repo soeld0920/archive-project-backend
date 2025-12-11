@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archive.archive_project_backend.repository.RefreshTokenMapper">
+    <resultMap id="RefreshTokenResultMap" type="com.archive.archive_project_backend.entity.RefreshToken">
+        <id property="refreshTokenId" column="refresh_token_id" />
+        <result property="userLoginId" column="user_login_Id" />
+        <result property="token" column="token" />
+        <result property="expireAt" column="expire_at" />
+        <result property="createAt" column="create_at" />
+        <result property="updateAt" column="update_at" />
+    </resultMap>
+
+<!--    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+
+    <insert id="insertRefreshToken">
+        insert into
+            refresh_token(user_login_id, token, expire_at, create_at)
+        values
+            (#{userLoginId}, #{token}, #{expireAt}, now());
+    </insert>
+
+    <select id="getRefreshTokenByToken" resultMap="RefreshTokenResultMap">
+        SELECT
+            refresh_token_id,
+            user_login_uuid,
+            token,
+            expire_at,
+            create_at,
+            update_at
+        FROM refresh_token
+        WHERE token = #{token}
+        LIMIT 1;
+    </select>
+
+    <delete id="deleteRefreshTokenById">
+        delete from
+            refresh_token
+        where
+            refresh_token_id = #{id}
+    </delete>
+</mapper>
