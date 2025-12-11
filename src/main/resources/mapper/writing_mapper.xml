@@ -5,15 +5,17 @@
 <mapper namespace="com.archive.archive_project_backend.repository.WritingMapper">
 
     <resultMap id="series" type="com.archive.archive_project_backend.entity.Series">
-
+        <id property="seriesUuid" column="series_uuid"/>
     </resultMap>
 
     <resultMap id="user" type="com.archive.archive_project_backend.entity.User">
-
+        <id property="userUuid" column="user_uuid"/>
     </resultMap>
 
     <resultMap id="category" type="com.archive.archive_project_backend.entity.Category">
-
+        <id property="categoryId" column="category_id"/>
+        <result property="mainCategory" column="main_category_name"/>
+        <result property="subCategory" column="category_name"/>
     </resultMap>
 
     <resultMap id="writingMap" type="com.archive.archive_project_backend.entity.Writing">
@@ -44,12 +46,48 @@
 
     <select id="selectWritingByUuid" resultMap="writingMap">
         select
-
+            w.writing_uuid,
+            w.title,
+            w.content,
+            w.view,
+            w.great,
+            w.create_at,
+            w.update_at,
+            c.category_id,
+            c.main_category_name,
+            c.category_name,
+            u.user_uuid,
+            s.series_uuid
         from
             writing w
         left join user u on w.author_uuid = u.user_uuid
         left join category_view c on w.category_id = c.category_id
         left join series s on s.series_uuid = w.series_uuid
+        where
+            w.writing_uuid = #{uuid}
+    </select>
 
+    <select id="getGreatedByUuids" resultType="boolean">
+        select exists(
+            select
+                great_id
+            from
+                great
+            where
+                user_info_uuid = #{userUuid} and
+                writing_uuid = #{writingUuid}
+        )
+    </select>
+
+    <select id="getBookmarkedByUuids" resultType="boolean">
+        select exists(
+            select
+                bookmark_id
+            from
+                bookmark
+            where
+                user_info_uuid = #{userUuid} and
+                writing_uuid = #{writingUuid}
+        )
     </select>
 </mapper>

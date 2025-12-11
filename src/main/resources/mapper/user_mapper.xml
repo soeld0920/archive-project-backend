@@ -2,20 +2,67 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!--todo : user 변경 시 이 mapper도 업데이트 해야함-->
 <mapper namespace="com.archive.archive_project_backend.repository.UserMapper">
     <resultMap id="userMap" type="com.archive.archive_project_backend.entity.User">
         <id property="userUuid" column="user_info_uuid"/>
+        <result property="name" column="name"/>
+        <result property="bio" column="bio"/>
+        <result property="email" column="email"/>
+        <result property="banner" column="banner"/>
+        <result property="createAt" column="create_at"/>
+        <result property="updateAt" column="update_at"/>
+        <association property="role" column="role_name" javaType="string"/>
     </resultMap>
 
     <!--   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
     <select id="getUserByUuid" resultMap="userMap">
         select
-            user_info_uuid
+            user_info_uuid,
+            name,
+            bio,
+            email,
+            banner,
+            create_at,
+            update_at,
+            role_name
         from
-            user_info
+            user_info_view
         where
             user_info_uuid = #{uuid}
     </select>
+
+    <select id="getUserByUserid" resultMap="userMap">
+        select
+            ui.user_info_uuid,
+            ui.name,
+            ui.bio,
+            ui.email,
+            ui.banner,
+            ui.create_at,
+            ui.update_at,
+            ui.role_name
+        from
+            user_info_view ui
+        inner join
+            user_login ul
+        on ul.user_info_uuid = ui.user_info_uuid
+        where
+            ul.userid = #{userid}
+    </select>
+
+    <insert id="insertUserInfo">
+        insert into
+            user_info(user_info_uuid, role_id, name, bio, email, banner, create_at, update_at)
+        values
+            (#{userUuid}, 2,#{name},#{bio},#{email},#{banner},now(),now())
+    </insert>
+
+    <insert id="insertUserLogin">
+        insert into
+            user_login(user_info_uuid, userid, passwd, create_at, update_at)
+        values
+            (#{userUuid},#{userid},#{passwd},now(),now())
+    </insert>
+
 </mapper>

@@ -1,6 +1,7 @@
 package com.archive.archive_project_backend.controller.advice;
 
 import com.archive.archive_project_backend.exception.AddWritingException;
+import com.archive.archive_project_backend.exception.FindWritingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,5 +13,10 @@ public class WritingExceptionHandler {
     @ExceptionHandler(AddWritingException.class)
     public ResponseEntity<String> handleAddWritingFail(AddWritingException e){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(FindWritingException.class)
+    public ResponseEntity<String> handleFindWritingException(FindWritingException e){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 }

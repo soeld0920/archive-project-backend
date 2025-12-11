@@ -1,7 +1,5 @@
 package com.archive.archive_project_backend.entity;
 
-//todo : 글 작성을 위한 최소한의 entity임.
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,13 +11,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Builder
-public class User {
+public class UserLogin {
+    private int userLoginId;
+    private String userid;
+    private String passwd;
     private String userUuid;
-    private String name;
-    private String bio;
-    private String email;
-    private String banner;
-    private String role;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
 }

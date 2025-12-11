@@ -4,6 +4,9 @@ import com.archive.archive_project_backend.entity.Category;
 import com.archive.archive_project_backend.entity.Series;
 import com.archive.archive_project_backend.entity.User;
 import com.archive.archive_project_backend.entity.Writing;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +22,14 @@ import java.util.UUID;
 @Data
 @Builder
 public class AddWritingReqDto {
+
+    @NotBlank(message = "제목은 비어있을 수 없습니다.")
+    @Size(max = 100, message = "제목은 100자 이하여야합니다.")
     private String title;
+
+    @NotBlank(message = "내용은 비어있을 수 없습니다.")
     private String content;
+
     private int categoryId;
     private String authorUuid;
     private List<String> tag;
