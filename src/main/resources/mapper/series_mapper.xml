@@ -14,15 +14,13 @@
         <!-- Category (Series 기준) -->
         <association property="category" javaType="com.archive.archive_project_backend.entity.Category">
             <id property="categoryId" column="category_id"/>
-            <result property="subCategory" column="category_name"/>
-            <result property="mainCategory" column="main_category_name"/>
         </association>
 
         <!-- Writing 목록 -->
         <collection property="writings" ofType="com.archive.archive_project_backend.entity.Writing">
             <id property="writingUuid" column="writing_uuid"/>
             <result property="title" column="writing_title"/>
-            <result property="content" column="content"/>
+            <result property="content" column="writing_content"/>
         </collection>
     </resultMap>
 
@@ -32,7 +30,7 @@
         select
             -- Series
             s.series_uuid,
-            s.title            AS series_title,
+            s.series_title,
             s.author_uuid      AS series_author_uuid,
             s.view             AS series_view,
             s.create_at        AS series_create_at,
@@ -40,20 +38,27 @@
 
             -- Series Category
             c.category_id,
-            c.category_name,
-            c.main_category_name,
 
             -- Writing
             w.writing_uuid,
-            w.title            AS writing_title,
-            w.content
+            w.writing_title,
+            w.writing_content
 
         FROM series s
-        LEFT JOIN category_view c
+        LEFT JOIN category c
             ON s.category_id = c.category_id
+        LEFT JOIN main_category mc
+            ON mc.main_category_id = c.main_category_id
         LEFT JOIN writing w
             ON s.series_uuid = w.series_uuid
 
         WHERE s.series_uuid = #{seriesUuid}
     </select>
+
+    <insert id="insertSeries">
+        insert into
+            series(series_uuid, author_uuid, series_title, category_id, create_at, update_at)
+        values
+            (#{seriesUuid}, #{authorUuid}, #{title}, #{category.categoryId}, now(), now())
+    </insert>
 </mapper>

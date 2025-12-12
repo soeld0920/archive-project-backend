@@ -94,7 +94,7 @@ public class UserService {
         if(userLogin == null){
             throw new SigninException("아이디가 존재하지 않습니다.", HttpStatus.BAD_REQUEST);
         }
-        log.info(reqDto.getPasswd());
+
         if(!encoder.matches(reqDto.getPasswd(), userLogin.getPasswd())){
             throw new SigninException("비밀번호가 틀립니다.", HttpStatus.BAD_REQUEST);
         }

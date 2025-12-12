@@ -1,5 +1,7 @@
 package com.archive.archive_project_backend.dto.res;
 
+import com.archive.archive_project_backend.entity.Series;
+import com.archive.archive_project_backend.entity.User;
 import com.archive.archive_project_backend.entity.Writing;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +14,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class FindWritingResDto {
     private Writing writing;
-    private boolean greated;
-    private boolean bookmarked;
+    //todo : 댓글
 }

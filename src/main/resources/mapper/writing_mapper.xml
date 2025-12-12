@@ -7,29 +7,27 @@
     <resultMap id="seriesMap" type="com.archive.archive_project_backend.entity.Series">
         <id property="seriesUuid" column="series_uuid"/>
         <result property="title" column="series_title"/>
-        <result property="view" column="series_view"/>
-        <result property="createAt" column="series_create_at"/>
-        <result property="updateAt" column="series_update_at"/>
     </resultMap>
 
     <resultMap id="user" type="com.archive.archive_project_backend.entity.User">
-        <id property="userUuid" column="user_uuid"/>
+        <id property="userUuid" column="author_uuid"/>
+        <result property="name" column="author_name"/>
     </resultMap>
 
     <resultMap id="category" type="com.archive.archive_project_backend.entity.Category">
-        <id property="categoryId" column="category_id"/>
         <result property="mainCategory" column="main_category_name"/>
         <result property="subCategory" column="category_name"/>
     </resultMap>
 
     <resultMap id="writingMap" type="com.archive.archive_project_backend.entity.Writing">
         <id property="writingUuid" column="writing_uuid"/>
-        <result property="title" column="title"/>
-        <result property="content" column="content"/>
+        <result property="title" column="writing_title"/>
+        <result property="content" column="writing_content"/>
         <result property="view" column="view"/>
         <result property="great" column="great"/>
         <result property="createAt" column="create_at"/>
         <result property="updateAt" column="update_at"/>
+        <result property="seriesOrder" column="series_order"/>
         <association property="series" resultMap="seriesMap"/>
         <association property="author" resultMap="user"/>
         <association property="category" resultMap="category"/>
@@ -42,7 +40,7 @@
 
     <insert id="insertWriting">
         insert into
-            writing(writing_uuid, title, content, series_uuid, author_uuid, category_id, create_at, update_at)
+            writing(writing_uuid, writing_title, writing_content, series_uuid, author_uuid, category_id, create_at, update_at)
         values
             (#{writingUuid}, #{title},#{content},#{series.seriesUuid},#{author.userUuid},
             #{category.categoryId},now(),now())
@@ -50,25 +48,23 @@
 
     <select id="selectWritingByUuid" resultMap="writingMap">
         select
-            w.writing_uuid,
-            w.title,
-            w.content,
-            w.view,
-            w.great,
-            w.create_at,
-            w.update_at,
-            c.category_id,
-            c.main_category_name,
-            c.category_name,
-            u.user_info_uuid,
-            s.series_uuid
+            writing_uuid,
+            writing_title,
+            writing_content,
+            view,
+            great,
+            create_at,
+            update_at,
+            main_category_name,
+            category_name,
+            author_uuid,
+            author_name,
+            series_uuid,
+            series_title
         from
-            writing w
-        left join user_info u on w.author_uuid = u.user_info_uuid
-        left join category_view c on w.category_id = c.category_id
-        left join series s on s.series_uuid = w.series_uuid
+            writing_view
         where
-            w.writing_uuid = #{uuid}
+            writing_uuid = #{uuid}
     </select>
 
     <select id="getGreatedByUuids" resultType="boolean">

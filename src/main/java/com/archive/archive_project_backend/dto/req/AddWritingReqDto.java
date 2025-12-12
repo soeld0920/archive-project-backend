@@ -1,9 +1,6 @@
 package com.archive.archive_project_backend.dto.req;
 
-import com.archive.archive_project_backend.entity.Category;
-import com.archive.archive_project_backend.entity.Series;
-import com.archive.archive_project_backend.entity.User;
-import com.archive.archive_project_backend.entity.Writing;
+import com.archive.archive_project_backend.entity.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -41,7 +38,7 @@ public class AddWritingReqDto {
                 .title(this.getTitle())
                 .content(this.getContent())
                 .author(author)
-                .tag(this.getTag())
+                .tag(Tag.asStrings(tag))
                 .series(series)
                 .category(category)
                 .build();

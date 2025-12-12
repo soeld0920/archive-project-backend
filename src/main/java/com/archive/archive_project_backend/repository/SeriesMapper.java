@@ -8,4 +8,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface SeriesMapper {
 
     public Series getSeriesByUuid(String uuid);
+
+    public int insertSeries(Series series);
 }

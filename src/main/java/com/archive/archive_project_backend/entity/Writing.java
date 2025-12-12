@@ -23,7 +23,7 @@ public class Writing {
     private User author;
     private int view;
     private int great;
-    private List<String> tag;
+    private List<Tag> tag;
     //api rule : series가 null이면 단편, 아니면 series 존재
     private Series series;
     private int seriesOrder;

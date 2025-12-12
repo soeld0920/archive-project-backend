@@ -16,15 +16,15 @@
 
     <insert id="insertRefreshToken">
         insert into
-            refresh_token(user_login_id, token, expire_at, create_at)
+            refresh_token(user_login_id, token, expire_at, create_at, update_at)
         values
-            (#{userLoginId}, #{token}, #{expireAt}, now());
+            (#{userLoginId}, #{token}, #{expireAt}, now(), now());
     </insert>
 
     <select id="getRefreshTokenByToken" resultMap="RefreshTokenResultMap">
         SELECT
             refresh_token_id,
-            user_login_uuid,
+            user_login_id,
             token,
             expire_at,
             create_at,

@@ -1,6 +1,6 @@
 package com.archive.archive_project_backend.controller.advice;
 
-import com.archive.archive_project_backend.exception.AddWritingException;
+import com.archive.archive_project_backend.exception.add.AddWritingException;
 import com.archive.archive_project_backend.exception.FindWritingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
