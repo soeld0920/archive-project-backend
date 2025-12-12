@@ -4,8 +4,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.archive.archive_project_backend.repository.WritingMapper">
 
-    <resultMap id="series" type="com.archive.archive_project_backend.entity.Series">
+    <resultMap id="seriesMap" type="com.archive.archive_project_backend.entity.Series">
         <id property="seriesUuid" column="series_uuid"/>
+        <result property="title" column="series_title"/>
+        <result property="view" column="series_view"/>
+        <result property="createAt" column="series_create_at"/>
+        <result property="updateAt" column="series_update_at"/>
     </resultMap>
 
     <resultMap id="user" type="com.archive.archive_project_backend.entity.User">
@@ -26,7 +30,7 @@
         <result property="great" column="great"/>
         <result property="createAt" column="create_at"/>
         <result property="updateAt" column="update_at"/>
-        <association property="series" resultMap="series"/>
+        <association property="series" resultMap="seriesMap"/>
         <association property="author" resultMap="user"/>
         <association property="category" resultMap="category"/>
         <collection property="tag" javaType="list"/>
@@ -56,11 +60,11 @@
             c.category_id,
             c.main_category_name,
             c.category_name,
-            u.user_uuid,
+            u.user_info_uuid,
             s.series_uuid
         from
             writing w
-        left join user u on w.author_uuid = u.user_uuid
+        left join user_info u on w.author_uuid = u.user_info_uuid
         left join category_view c on w.category_id = c.category_id
         left join series s on s.series_uuid = w.series_uuid
         where

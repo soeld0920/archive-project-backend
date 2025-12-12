@@ -31,7 +31,6 @@ public class AddWritingReqDto {
     private String content;
 
     private int categoryId;
-    private String authorUuid;
     private List<String> tag;
     //api rule : series가 null이면 단편, 아니면 series 존재
     private String seriesUuid;

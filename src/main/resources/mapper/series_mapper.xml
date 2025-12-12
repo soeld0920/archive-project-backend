@@ -2,20 +2,58 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!--todo : user 변경 시 이 mapper도 업데이트 해야함-->
 <mapper namespace="com.archive.archive_project_backend.repository.SeriesMapper">
-    <resultMap id="userMap" type="com.archive.archive_project_backend.entity.Series">
+    <resultMap id="seriesMap" type="com.archive.archive_project_backend.entity.Series">
         <id property="seriesUuid" column="series_uuid"/>
+        <result property="title" column="series_title"/>
+        <result property="authorUuid" column="series_author_uuid"/>
+        <result property="view" column="series_view"/>
+        <result property="createAt" column="series_create_at"/>
+        <result property="updateAt" column="series_update_at"/>
+
+        <!-- Category (Series 기준) -->
+        <association property="category" javaType="com.archive.archive_project_backend.entity.Category">
+            <id property="categoryId" column="category_id"/>
+            <result property="subCategory" column="category_name"/>
+            <result property="mainCategory" column="main_category_name"/>
+        </association>
+
+        <!-- Writing 목록 -->
+        <collection property="writings" ofType="com.archive.archive_project_backend.entity.Writing">
+            <id property="writingUuid" column="writing_uuid"/>
+            <result property="title" column="writing_title"/>
+            <result property="content" column="content"/>
+        </collection>
     </resultMap>
 
     <!--   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
-    <select id="getSeriesByUuid" resultMap="userMap">
+    <select id="getSeriesByUuid" resultMap="seriesMap">
         select
-            series_uuid
-        from
-            series
-        where
-            series_uuid = #{uuid}
+            -- Series
+            s.series_uuid,
+            s.title            AS series_title,
+            s.author_uuid      AS series_author_uuid,
+            s.view             AS series_view,
+            s.create_at        AS series_create_at,
+            s.update_at        AS series_update_at,
+
+            -- Series Category
+            c.category_id,
+            c.category_name,
+            c.main_category_name,
+
+            -- Writing
+            w.writing_uuid,
+            w.title            AS writing_title,
+            w.content
+
+        FROM series s
+        LEFT JOIN category_view c
+            ON s.category_id = c.category_id
+        LEFT JOIN writing w
+            ON s.series_uuid = w.series_uuid
+
+        WHERE s.series_uuid = #{seriesUuid}
     </select>
 </mapper>

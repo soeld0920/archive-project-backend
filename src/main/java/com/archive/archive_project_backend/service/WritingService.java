@@ -30,11 +30,11 @@ public class WritingService {
 
     //단건 글 추가
     @Transactional(rollbackFor = Exception.class)
-    public void addWriting(AddWritingReqDto dto){
+    public void addWriting(AddWritingReqDto dto, String authorUuid){
 
         //식별자 생성 및 entity 받아옴
         String uuid = UUID.randomUUID().toString();
-        User author = userMapper.getUserByUuid(dto.getAuthorUuid());
+        User author = userMapper.getUserByUuid(authorUuid);
         Category category = categoryMapper.getCategoryById(dto.getCategoryId());
         Series series = seriesMapper.getSeriesByUuid(dto.getSeriesUuid());
 

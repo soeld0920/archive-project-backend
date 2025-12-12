@@ -26,4 +26,5 @@ public class Writing {
     private List<String> tag;
     //api rule : series가 null이면 단편, 아니면 series 존재
     private Series series;
+    private int seriesOrder;
 }

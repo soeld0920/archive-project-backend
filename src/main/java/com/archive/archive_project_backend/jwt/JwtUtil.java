@@ -1,11 +1,13 @@
 package com.archive.archive_project_backend.jwt;
 
 import com.archive.archive_project_backend.constants.JwtConstants;
+import com.archive.archive_project_backend.exception.BadRequestException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

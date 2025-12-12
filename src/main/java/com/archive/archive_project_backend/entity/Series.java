@@ -7,11 +7,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class Series {
     private String seriesUuid;
-
+    private String title;
+    private String authorUuid;
+    private Category category;
+    private int view;
+    private LocalDateTime createAt;
+    private LocalDateTime updateAt;
+    private List<Writing> writings;
 }

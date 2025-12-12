@@ -30,7 +30,7 @@ public class JwtAuthentication implements Authentication {
     }
 
     @Override
-    public Object getPrincipal() {
+    public String getPrincipal() {
         return userUuid;//식별자
     }
 
