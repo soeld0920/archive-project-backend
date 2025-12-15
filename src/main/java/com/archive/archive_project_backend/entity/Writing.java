@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,8 +24,14 @@ public class Writing {
     private User author;
     private int view;
     private int great;
+    private int commentCount;
     private List<Tag> tag;
     //api rule : series가 null이면 단편, 아니면 series 존재
     private Series series;
     private int seriesOrder;
+    private List<Comment> comments;
+
+    public void sortComments(){
+        comments.sort(Comparator.comparingInt(Comment::getCommentId));
+    }
 }

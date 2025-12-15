@@ -1,5 +1,6 @@
 package com.archive.archive_project_backend.controller.advice;
 
+import com.archive.archive_project_backend.exception.FastRequestException;
 import com.archive.archive_project_backend.exception.add.AddWritingException;
 import com.archive.archive_project_backend.exception.FindWritingException;
 import org.springframework.http.HttpStatus;
@@ -18,5 +19,10 @@ public class WritingExceptionHandler {
     @ExceptionHandler(FindWritingException.class)
     public ResponseEntity<String> handleFindWritingException(FindWritingException e){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(FastRequestException.class)
+    public ResponseEntity<String> handleFastRequestException(FastRequestException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("요청이 너무 빠릅니다");
     }
 }

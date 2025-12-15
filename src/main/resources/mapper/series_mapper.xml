@@ -21,8 +21,11 @@
             <id property="writingUuid" column="writing_uuid"/>
             <result property="title" column="writing_title"/>
             <result property="content" column="writing_content"/>
+            <result property="seriesOrder" column="series_order"/>
         </collection>
     </resultMap>
+
+
 
     <!--   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
@@ -42,7 +45,8 @@
             -- Writing
             w.writing_uuid,
             w.writing_title,
-            w.writing_content
+            w.writing_content,
+            w.series_order
 
         FROM series s
         LEFT JOIN category c

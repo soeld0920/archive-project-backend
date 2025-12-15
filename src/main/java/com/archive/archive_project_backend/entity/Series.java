@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @AllArgsConstructor
@@ -23,4 +24,8 @@ public class Series {
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     private List<Writing> writings;
+
+    public void writingsSort(){
+       writings.sort(Comparator.comparingInt(Writing::getSeriesOrder));
+    }
 }

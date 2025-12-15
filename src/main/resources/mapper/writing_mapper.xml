@@ -25,6 +25,7 @@
         <result property="content" column="writing_content"/>
         <result property="view" column="view"/>
         <result property="great" column="great"/>
+        <result property="commentCount" column="comment_count"/>
         <result property="createAt" column="create_at"/>
         <result property="updateAt" column="update_at"/>
         <result property="seriesOrder" column="series_order"/>
@@ -53,6 +54,7 @@
             writing_content,
             view,
             great,
+            comment_count,
             create_at,
             update_at,
             main_category_name,
@@ -90,4 +92,70 @@
                 writing_uuid = #{writingUuid}
         )
     </select>
+
+    <select id="existsWritingByUuid" resultType="boolean">
+        select exists(
+            select
+                1
+            from
+                writing
+            where
+                writing_uuid = #{writingUuid}
+        )
+    </select>
+
+    <insert id="insertGreated">
+        insert into
+            great(writing_uuid, user_info_uuid)
+        values
+            (#{writingUuid}, #{userUuid})
+    </insert>
+
+    <delete id="deleteGreated">
+        delete from
+            great
+        where
+            user_info_uuid = #{userUuid} and
+            writing_uuid = #{writingUuid}
+    </delete>
+
+    <insert id="insertBookmarked">
+        insert into
+            bookmark(writing_uuid, user_info_uuid)
+        values
+            (#{writingUuid}, #{userUuid})
+    </insert>
+
+    <delete id="deleteBookmarked">
+        delete from
+            bookmark
+        where
+            user_info_uuid = #{userUuid} and
+            writing_uuid = #{writingUuid}
+    </delete>
+
+    <update id="increaseGreat">
+        UPDATE writing
+        SET great = great + 1
+        WHERE writing_uuid = #{writingUuid}
+    </update>
+
+    <update id="decreaseGreat">
+        UPDATE writing
+        SET great = great - 1
+        WHERE writing_uuid = #{writingUuid}
+    </update>
+
+    <update id="increaseView">
+        UPDATE writing
+        SET view = view + 1
+        WHERE writing_uuid = #{writingUuid}
+    </update>
+
+    <update id="decreaseView">
+        UPDATE writing
+        SET view = view - 1
+        WHERE writing_uuid = #{writingUuid}
+    </update>
+
 </mapper>

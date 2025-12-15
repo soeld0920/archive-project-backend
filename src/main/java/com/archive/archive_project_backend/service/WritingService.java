@@ -3,13 +3,16 @@ package com.archive.archive_project_backend.service;
 import com.archive.archive_project_backend.dto.req.AddWritingReqDto;
 import com.archive.archive_project_backend.dto.req.FindWritingReqDto;
 import com.archive.archive_project_backend.dto.res.FindWritingResDto;
+import com.archive.archive_project_backend.dto.res.WritingInteractionStateResDto;
 import com.archive.archive_project_backend.entity.*;
+import com.archive.archive_project_backend.exception.FastRequestException;
 import com.archive.archive_project_backend.exception.add.AddTagException;
 import com.archive.archive_project_backend.exception.add.AddWritingException;
 import com.archive.archive_project_backend.exception.BadRequestException;
 import com.archive.archive_project_backend.exception.FindWritingException;
 import com.archive.archive_project_backend.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WritingService {
     private final WritingMapper writingMapper;
     private final CategoryMapper categoryMapper;
@@ -83,7 +87,7 @@ public class WritingService {
     @Transactional(rollbackFor = Exception.class)
     public FindWritingResDto findWritingByUuid(FindWritingReqDto reqDto){
         //가드
-        if(reqDto.getWritingUuid() == null || reqDto.getUserUuid() == null){
+        if(reqDto.getWritingUuid() == null){
             throw new BadRequestException("글 찾기의 요청이 이상합니다.");
         }
 
@@ -98,7 +102,84 @@ public class WritingService {
         List<Tag> tags = tagMapper.selectTagsByWritingUuid(writing.getWritingUuid());
         writing.setTag(tags);
 
-        return FindWritingResDto.builder().writing(writing).build();
+        return FindWritingResDto.from(writing);
     }
 
+    //좋아요 / 북마크 여부 반환
+    @Transactional
+    public WritingInteractionStateResDto getWritingInteractionState(String writingUuid, String userUuid){
+        //비로그인 처리
+        if(userUuid == null){
+            return new WritingInteractionStateResDto(false, false);
+        }
+
+        if(!writingMapper.existsWritingByUuid(writingUuid)){
+            throw new BadRequestException("해당 글은 존재하지 않습니다.");
+        }
+
+        return new WritingInteractionStateResDto(
+                writingMapper.getGreatedByUuids(writingUuid, userUuid),
+                writingMapper.getBookmarkedByUuids(writingUuid, userUuid)
+        );
+    }
+
+    //좋아요 켜기
+    @Transactional(rollbackFor = Exception.class)
+    public void greatedWriting(String writingUuid, String userUuid){
+        if(!writingMapper.existsWritingByUuid(writingUuid)){
+            throw new BadRequestException("해당 글은 존재하지 않습니다.");
+        }
+
+        int successCount = writingMapper.insertGreated(writingUuid, userUuid);
+        if(successCount < 1){
+            throw new FastRequestException();
+        }
+
+        successCount = writingMapper.increaseGreat(writingUuid);
+        if(successCount < 1){
+            throw new FastRequestException();
+        }
+    }
+
+    //좋아요 끄기
+    @Transactional(rollbackFor = Exception.class)
+    public void ungreatedWriting(String writingUuid, String userUuid){
+        if(!writingMapper.existsWritingByUuid(writingUuid)){
+            throw new BadRequestException("해당 글은 존재하지 않습니다.");
+        }
+
+        int successCount = writingMapper.deleteGreated(writingUuid, userUuid);
+        if(successCount < 1){
+            throw new FastRequestException();
+        }
+
+        successCount = writingMapper.decreaseGreat(writingUuid);
+        if(successCount < 1){
+            throw new FastRequestException();
+        }
+    }
+
+    //북마크 켜기
+    public void bookmarkedWriting(String writingUuid, String userUuid){
+        if(!writingMapper.existsWritingByUuid(writingUuid)){
+            throw new BadRequestException("해당 글은 존재하지 않습니다.");
+        }
+
+        int successCount = writingMapper.insertBookmarked(writingUuid, userUuid);
+        if(successCount < 1){
+            throw new FastRequestException();
+        }
+    }
+
+    //북마크 끄기
+    public void unbookmarkedWriting(String writingUuid, String userUuid){
+        if(!writingMapper.existsWritingByUuid(writingUuid)){
+            throw new BadRequestException("해당 글은 존재하지 않습니다.");
+        }
+
+        int successCount = writingMapper.deleteBookmarked(writingUuid, userUuid);
+        if(successCount < 1){
+            throw new FastRequestException();
+        }
+    }
 }

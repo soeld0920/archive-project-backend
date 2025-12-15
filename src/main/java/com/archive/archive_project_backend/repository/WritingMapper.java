@@ -22,4 +22,43 @@ public interface WritingMapper {
             @Param("writingUuid") String writingUuid,
             @Param("userUuid") String userUuid
     );
+
+    //좋아요 토글
+    int insertGreated(
+            @Param("writingUuid") String writingUuid,
+            @Param("userUuid") String userUuid
+    );
+
+    int deleteGreated(
+            @Param("writingUuid") String writingUuid,
+            @Param("userUuid") String userUuid
+    );
+
+    //북마크 토글
+    int insertBookmarked(
+            @Param("writingUuid") String writingUuid,
+            @Param("userUuid") String userUuid
+    );
+
+    int deleteBookmarked(
+            @Param("writingUuid") String writingUuid,
+            @Param("userUuid") String userUuid
+    );
+
+    //메타데이터 증가
+    int increaseView(
+            @Param("writingUuid") String writingUuid
+    );
+    int decreaseView(
+            @Param("writingUuid") String writingUuid
+    );
+    int increaseGreat(
+            @Param("writingUuid") String writingUuid
+    );
+    int decreaseGreat(
+            @Param("writingUuid") String writingUuid
+    );
+
+    //여부만 반환
+    boolean existsWritingByUuid(String writingUuid);
 }

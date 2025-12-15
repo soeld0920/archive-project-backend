@@ -11,7 +11,7 @@
         <result property="banner" column="banner"/>
         <result property="createAt" column="create_at"/>
         <result property="updateAt" column="update_at"/>
-        <association property="role" column="role_name" javaType="string"/>
+        <association property="role" column="role_name" resultMap="roleMap"/>
     </resultMap>
 
     <resultMap id="userLoginMap" type="com.archive.archive_project_backend.entity.UserLogin">
@@ -21,6 +21,11 @@
         <result property="userUuid" column="user_info_uuid"/>
         <result property="createAt" column="create_at"/>
         <result property="updateAt" column="update_at"/>
+    </resultMap>
+
+    <resultMap id="roleMap" type="com.archive.archive_project_backend.entity.Role">
+        <id property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
     </resultMap>
     <!--   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
 
@@ -33,6 +38,7 @@
             banner,
             create_at,
             update_at,
+            role_id,
             role_name
         from
             user_info_view
@@ -42,21 +48,19 @@
 
     <select id="getUserByUserid" resultMap="userMap">
         select
-            ui.user_info_uuid,
-            ui.name,
-            ui.bio,
-            ui.email,
-            ui.banner,
-            ui.create_at,
-            ui.update_at,
-            ui.role_name
+            user_info_uuid,
+            name,
+            bio,
+            email,
+            banner,
+            create_at,
+            update_at,
+            role_id,
+            role_name
         from
-            user_info_view ui
-        inner join
-            user_login ul
-        on ul.user_info_uuid = ui.user_info_uuid
+            user_info_view
         where
-            ul.userid = #{userid}
+            userid = #{userid}
     </select>
 
     <select id="getUserLoginById" resultMap="userLoginMap">
@@ -100,5 +104,16 @@
         values
             (#{userUuid},#{userid},#{passwd},now(),now())
     </insert>
+
+    <select id="existsUserByUuid" resultType="boolean">
+        select exists (
+            select
+                1
+            from
+                user_info
+            where
+                user_info_uuid = #{uuid}
+        )
+    </select>
 
 </mapper>

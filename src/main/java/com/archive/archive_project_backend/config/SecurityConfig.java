@@ -4,8 +4,10 @@ import com.archive.archive_project_backend.jwt.JwtAuthenticationEntrypoint;
 import com.archive.archive_project_backend.jwt.JwtAuthenticationFilter;
 import com.archive.archive_project_backend.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,6 +22,7 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
     private final JwtUtil jwtUtil;
 
@@ -34,24 +37,25 @@ public class SecurityConfig {
 
     //cross origin resource sharing 에러 방지 설정
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(){
-        CorsConfiguration cors = new CorsConfiguration();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
 
-        cors.setAllowedOrigins(List.of("http;//localhost:3000"));
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
 
-        cors.setAllowCredentials(true);
-        cors.setExposedHeaders(List.of("Set-Cookie"));
+        // ⭐ 핵심: preflight에서 요구하는 헤더 허용
+        config.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With"));
 
-        cors.addAllowedHeader(CorsConfiguration.ALL);
-        cors.addAllowedMethod(CorsConfiguration.ALL);
+        // ⭐ 쿠키(리프레시) 쓰면 필수
+        config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource sc = new UrlBasedCorsConfigurationSource();
+        // (선택) 클라에서 읽어야 하는 헤더가 있으면
+        config.setExposedHeaders(List.of("Authorization"));
 
-        sc.registerCorsConfiguration("/**", cors);
-
-        return sc;
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
-
     //filterChain 설정
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -75,8 +79,8 @@ public class SecurityConfig {
 
         //url 권한 설정
         http.authorizeHttpRequests(auth -> {
-            auth.requestMatchers("/api/user/**").permitAll();
-            auth.anyRequest().authenticated();
+            //auth.requestMatchers(HttpMethod.POST,"/api/writing/*/comment").authenticated();
+            auth.anyRequest().permitAll();
         });
 
         return http.build();

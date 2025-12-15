@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archive.archive_project_backend.repository.CommentMapper">
+    <resultMap id="commentMap" type="com.archive.archive_project_backend.entity.Comment">
+        <id property="commentId" column="comment_id"/>
+        <result property="content" column="content"/>
+        <result property="updateAt" column="update_at"/>
+        <result property="createAt" column="create_at"/>
+        <result property="writingOrder" column="writing_order"/>
+        <association property="writing" resultMap="writingMap"/>
+        <association property="author" resultMap="authorMap"/>
+    </resultMap>
+
+    <resultMap id="writingMap" type="com.archive.archive_project_backend.entity.Writing">
+        <id property="writingUuid" column="writing_uuid"/>
+    </resultMap>
+
+    <resultMap id="authorMap" type="com.archive.archive_project_backend.entity.User">
+        <id property="userUuid" column="user_info_uuid"/>
+        <result property="name" column="name"/>
+        <result property="banner" column="banner"/>
+    </resultMap>
+<!--        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+
+    <insert id="insertComment">
+        insert into
+            comment(writing_uuid, content, user_info_uuid, writing_order, create_at, update_at)
+        values
+            (#{writing.writingUuid}, #{content}, #{author.userUuid}, #{writingOrder}, now(), now())
+    </insert>
+
+    <select id="selectCommentsByWritingUuid" resultMap="commentMap">
+        select
+            c.comment_id,
+            c.writing_uuid,
+            c.content,
+            c.user_info_uuid,
+            c.writing_order,
+            c.create_at,
+            c.update_at,
+            u.name,
+            u.banner
+        from
+            comment c
+        left join user_info u
+            on u.user_info_uuid = c.user_info_uuid
+        where
+            writing_uuid = #{writingUuid}
+    </select>
+
+    <select id="getNextCommentOrder" resultType="int">
+        select
+            coalesce(max(writing_order), 0) + 1
+        from
+            comment
+        where
+            writing_uuid = #{writingUuid}
+    </select>
+</mapper>

@@ -19,4 +19,7 @@ public interface UserMapper {
 
     //login 정보 가져오기
     public UserLogin selectUserLoginByUserid(String userid);
+
+    //존재 여부 반환
+    public boolean existsUserByUuid(String uuid);
 }

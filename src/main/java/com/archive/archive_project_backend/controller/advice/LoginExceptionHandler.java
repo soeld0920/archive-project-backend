@@ -1,6 +1,7 @@
 package com.archive.archive_project_backend.controller.advice;
 
 import com.archive.archive_project_backend.exception.BadRequestException;
+import com.archive.archive_project_backend.exception.JwtAuthenticationException;
 import com.archive.archive_project_backend.exception.login.LoginException;
 import com.archive.archive_project_backend.exception.login.SignupException;
 import org.springframework.http.HttpStatus;
@@ -14,5 +15,10 @@ public class LoginExceptionHandler {
     @ExceptionHandler(LoginException.class)
     public ResponseEntity<String> BadRequestExceptionHandler(LoginException e){
         return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
+    }
+
+    @ExceptionHandler(JwtAuthenticationException.class)
+    public ResponseEntity<String> JwtAuthenticationExceptionHandler(JwtAuthenticationException e){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
 }
