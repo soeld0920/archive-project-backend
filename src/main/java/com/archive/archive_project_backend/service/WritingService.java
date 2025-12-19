@@ -182,4 +182,16 @@ public class WritingService {
             throw new FastRequestException();
         }
     }
+
+    //조회수 증가
+    public void increaseView(String writingUuid){
+        if(!writingMapper.existsWritingByUuid(writingUuid)){
+            throw new BadRequestException("해당 글은 존재하지 않습니다.");
+        }
+
+        int successCount = writingMapper.increaseView(writingUuid);
+        if(successCount < 1){
+            throw new FastRequestException();
+        }
+    }
 }

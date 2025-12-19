@@ -89,4 +89,12 @@ public class WritingController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{writingUuid}/view")
+    public ResponseEntity<Void> increaseView(
+            @PathVariable String writingUuid
+    ){
+        writingService.increaseView(writingUuid);
+        return ResponseEntity.noContent().build();
+    }
 }
