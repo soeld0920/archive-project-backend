@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archive.archive_project_backend.repository.SearchMapper">
+    <resultMap id="seriesMap" type="com.archive.archive_project_backend.entity.Series">
+        <id property="seriesUuid" column="series_uuid"/>
+        <result property="title" column="series_title"/>
+    </resultMap>
+
+    <resultMap id="user" type="com.archive.archive_project_backend.entity.User">
+        <id property="userUuid" column="author_uuid"/>
+        <result property="name" column="author_name"/>
+    </resultMap>
+
+    <resultMap id="category" type="com.archive.archive_project_backend.entity.Category">
+        <result property="subCategory" column="category_name"/>
+        <association property="mainCategory" javaType="com.archive.archive_project_backend.entity.MainCategory">
+            <result property="mainCategory" column="main_category_name"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="writingMap" type="com.archive.archive_project_backend.entity.Writing">
+        <id property="writingUuid" column="writing_uuid"/>
+        <result property="title" column="writing_title"/>
+        <result property="content" column="writing_content"/>
+        <result property="view" column="view"/>
+        <result property="great" column="great"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="createAt" column="create_at"/>
+        <result property="updateAt" column="update_at"/>
+        <result property="seriesOrder" column="series_order"/>
+        <association property="series" resultMap="seriesMap"/>
+        <association property="author" resultMap="user"/>
+        <association property="category" resultMap="category"/>
+        <collection property="tag" javaType="list"/>
+    </resultMap>
+
+
+<!--    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+
+    <select id="searchWriting" resultMap="writingMap">
+        select
+            writing_uuid,
+            writing_title,
+            writing_content,
+            view,
+            great,
+            comment_count,
+            create_at,
+            update_at,
+            main_category_name,
+            category_name,
+            author_uuid,
+            author_name,
+            series_uuid,
+            series_title
+        from
+            writing_view
+        where
+            1=1
+            <if test="mainCategoryId != null &amp;&amp; categoryId == null">
+                and main_category_id = #{mainCategoryId}
+            </if>
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
+            </if>
+            <if test="isSeries != null">
+                <if test="isSeries == false">
+                    and series_uuid is null
+                </if>
+                <if test="isSeries == true">
+                    and series_uuid is not null
+                </if>
+            </if>
+            <if test="from != null">
+                and create_at &gt;= #{from}
+            </if>
+            <if test="to != null">
+                and create_at &lt;= #{to}
+            </if>
+            <if test="viewMin != null">
+                and view &gt;= #{viewMin}
+            </if>
+            <if test="viewMax != null">
+                and view &lt;= #{viewMax}
+            </if>
+            <if test="greatMin != null">
+                and great &gt;= #{greatMin}
+            </if>
+            <if test="greatMax != null">
+                and great &lt;= #{greatMax}
+            </if>
+            <if test="author != null">
+                and author_name like concat('%', #{author})
+            </if>
+            <if test="title != null">
+            and writing_title like concat('%', #{title})
+            </if>
+        <choose>
+            <when test="sortCode == 1">
+<!--                todo-->
+            </when>
+            <when test="sortCode == 2">
+                <!--                todo-->
+            </when>
+            <when test="sortCode == 3">
+                order by create_at desc
+            </when>
+            <when test="sortCode == 4">
+                order by create_at asc
+            </when>
+            <when test="sortCode == 5">
+                order by view desc
+            </when>
+            <when test="sortCode == 6">
+                order by view asc
+            </when>
+            <when test="sortCode == 7">
+                order by great desc
+            </when>
+            <when test="sortCode == 8">
+                order by great asc
+            </when>
+            <when test="sortCode == 9">
+                order by writing_title asc
+            </when>
+            <otherwise>
+                order by create_at desc
+            </otherwise>
+        </choose>
+        limit #{limit}
+        offset #{offset}
+    </select>
+
+    <select id="searchWritingLength" resultType="int">
+        select
+            count(*)
+        from
+        writing_view
+        where
+        1=1
+        <if test="mainCategoryId != null &amp;&amp; categoryId == null">
+            and main_category_id = #{mainCategoryId}
+        </if>
+        <if test="categoryId != null">
+            and category_id = #{categoryId}
+        </if>
+        <if test="isSeries != null">
+            <if test="isSeries == false">
+                and series_uuid is null
+            </if>
+            <if test="isSeries == true">
+                and series_uuid is not null
+            </if>
+        </if>
+        <if test="from != null">
+            and create_at &gt;= #{from}
+        </if>
+        <if test="to != null">
+            and create_at &lt;= #{to}
+        </if>
+        <if test="viewMin != null">
+            and view &gt;= #{viewMin}
+        </if>
+        <if test="viewMax != null">
+            and view &lt;= #{viewMax}
+        </if>
+        <if test="greatMin != null">
+            and great &gt;= #{greatMin}
+        </if>
+        <if test="greatMax != null">
+            and great &lt;= #{greatMax}
+        </if>
+        <if test="author != null">
+            and author_name like concat('%', #{author})
+        </if>
+        <if test="title != null">
+            and writing_title like concat('%', #{title})
+        </if>
+    </select>
+</mapper>
