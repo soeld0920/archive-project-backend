@@ -6,7 +6,12 @@
     <resultMap id="categoryMap" type="com.archive.archive_project_backend.entity.Category">
         <id property="categoryId" column="category_id"/>
         <result property="subCategory" column="category_name"/>
-        <association property="mainCategory" column="main_category_name" javaType="string"/>
+        <association property="mainCategory" resultMap="mainCategoryMap"/>
+    </resultMap>
+
+    <resultMap id="mainCategoryMap" type="com.archive.archive_project_backend.entity.MainCategory">
+        <id property="mainCategoryId" column="main_category_id"/>
+        <result property="mainCategory" column="main_category_name"/>
     </resultMap>
 
     <!--   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
@@ -15,10 +20,30 @@
         select
             category_id,
             category_name,
+            main_category_id,
             main_category_name
         from
             category_view
         where
             category_id = #{id}
     </select>
+
+    <select id="getMainCategories" resultMap="mainCategoryMap">
+        select
+            main_category_id,
+            main_category_name
+        from
+            main_category
+    </select>
+
+    <select id="getCategories" resultMap="categoryMap">
+        select
+            category_id,
+            category_name
+        from
+            category
+        where
+            main_category_id = #{id}
+    </select>
+
 </mapper>

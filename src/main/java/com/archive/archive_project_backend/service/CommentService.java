@@ -8,9 +8,11 @@ import com.archive.archive_project_backend.entity.Writing;
 import com.archive.archive_project_backend.exception.BadRequestException;
 import com.archive.archive_project_backend.exception.add.AddCommentException;
 import com.archive.archive_project_backend.repository.CommentMapper;
+import com.archive.archive_project_backend.repository.UserMapper;
 import com.archive.archive_project_backend.repository.WritingMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -21,7 +23,9 @@ import java.util.stream.Collectors;
 public class CommentService {
     private final CommentMapper commentMapper;
     private final WritingMapper writingMapper;
+    private final UserMapper userMapper;
 
+    @Transactional(rollbackFor = Exception.class)
     public void addComment(String writingUuid, AddCommentReqDto dto, String authorUuid){
         if(!writingMapper.existsWritingByUuid(writingUuid)){
             throw new BadRequestException("해당 글이 존재하지 않습니다.");
@@ -38,6 +42,11 @@ public class CommentService {
                 .build();
 
         int successCount = commentMapper.insertComment(comment);
+        if(successCount < 1){
+            throw new AddCommentException();
+        }
+
+        successCount = userMapper.updateTotalCommentDelta(authorUuid, 1);
         if(successCount < 1){
             throw new AddCommentException();
         }

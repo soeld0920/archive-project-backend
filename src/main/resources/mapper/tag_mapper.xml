@@ -55,4 +55,11 @@
         where
             w.writing_uuid = #{writingUuid}
     </select>
+
+    <delete id="deleteWritingTag">
+        delete from
+            writing_tag
+        where
+            writing_uuid = #{writingUuid}
+    </delete>
 </mapper>

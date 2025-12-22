@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class LoginExceptionHandler {
 
     @ExceptionHandler(LoginException.class)
-    public ResponseEntity<String> BadRequestExceptionHandler(LoginException e){
+    public ResponseEntity<String> LoginExceptionHandler(LoginException e){
         return ResponseEntity.status(e.getHttpStatus()).body(e.getMessage());
     }
 

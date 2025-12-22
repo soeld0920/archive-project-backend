@@ -1,5 +1,6 @@
-package com.archive.archive_project_backend.service;
+package com.archive.archive_project_backend.service.writing;
 
+import com.archive.archive_project_backend.constants.FileConstants;
 import com.archive.archive_project_backend.dto.req.AddWritingReqDto;
 import com.archive.archive_project_backend.dto.req.FindWritingReqDto;
 import com.archive.archive_project_backend.dto.res.FindWritingResDto;
@@ -11,11 +12,14 @@ import com.archive.archive_project_backend.exception.add.AddWritingException;
 import com.archive.archive_project_backend.exception.BadRequestException;
 import com.archive.archive_project_backend.exception.FindWritingException;
 import com.archive.archive_project_backend.repository.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Service
@@ -27,16 +31,13 @@ public class WritingService {
     private final SeriesMapper seriesMapper;
     private final UserMapper userMapper;
     private final TagMapper tagMapper;
+    private final ObjectMapper objectMapper;
+    private final WritingContentImageMigrator writingContentImageMigrator;
 
-    //글과 tag를 연결
-    @Transactional(rollbackFor = Exception.class)
-    private void addTags(List<Tag> tags){
-
-    }
 
     //단건 글 추가
     @Transactional(rollbackFor = Exception.class)
-    public void addWriting(AddWritingReqDto dto, String authorUuid){
+    public void addWriting(AddWritingReqDto dto, String authorUuid) throws IOException {
 
         //식별자 생성 및 entity 받아옴
         String uuid = UUID.randomUUID().toString();
@@ -59,8 +60,13 @@ public class WritingService {
         //태그 중복 제거
         dto.setTag(new ArrayList<>(new LinkedHashSet<>(dto.getTag())));
 
+        //이미지 주소를 옮기기
+        writingContentImageMigrator.migrateTmpImages(
+                dto.getContent(),
+                FileConstants.WRITING + "/" + uuid);
+
         //entity 생성
-        Writing writing = dto.toEntity(uuid,author, category, series);
+        Writing writing = dto.toEntity(uuid,author, category, series, objectMapper);
 
         //추가
         int successCount = writingMapper.insertWriting(writing);
@@ -74,12 +80,20 @@ public class WritingService {
         //id 얻어오기
         List<Tag> tags = tagMapper.getTagsByTagNames(writing.getTag());
 
+        //series면 다은 order 가져오기
+        if(dto.getSeriesUuid() != null) {
+            writing.setSeriesOrder(seriesMapper.getNextSeriesOrder(dto.getSeriesUuid()));
+        }
+
         //이를 연결함
         successCount = tagMapper.insertWritingTags(writing.getWritingUuid(), tags);
 
         if(successCount < tags.size()){
             throw new AddTagException();
         }
+
+        //메타데이터 증가
+        userMapper.updateTotalWritingDelta(authorUuid, 1);
     }
 
     //단건 글 조회
@@ -102,7 +116,7 @@ public class WritingService {
         List<Tag> tags = tagMapper.selectTagsByWritingUuid(writing.getWritingUuid());
         writing.setTag(tags);
 
-        return FindWritingResDto.from(writing);
+        return FindWritingResDto.from(writing, objectMapper);
     }
 
     //좋아요 / 북마크 여부 반환
@@ -139,6 +153,12 @@ public class WritingService {
         if(successCount < 1){
             throw new FastRequestException();
         }
+
+        String authorUuid = writingMapper.getAuthorUuidByUuid(writingUuid);
+        successCount = userMapper.updateTotalGreatDelta(authorUuid, 1);
+        if(successCount < 1){
+            throw new FastRequestException();
+        }
     }
 
     //좋아요 끄기
@@ -154,6 +174,12 @@ public class WritingService {
         }
 
         successCount = writingMapper.decreaseGreat(writingUuid);
+        if(successCount < 1){
+            throw new FastRequestException();
+        }
+
+        String authorUuid = writingMapper.getAuthorUuidByUuid(writingUuid);
+        successCount = userMapper.updateTotalGreatDelta(authorUuid, -1);
         if(successCount < 1){
             throw new FastRequestException();
         }
@@ -184,6 +210,7 @@ public class WritingService {
     }
 
     //조회수 증가
+    @Transactional(rollbackFor = Exception.class)
     public void increaseView(String writingUuid){
         if(!writingMapper.existsWritingByUuid(writingUuid)){
             throw new BadRequestException("해당 글은 존재하지 않습니다.");
@@ -192,6 +219,50 @@ public class WritingService {
         int successCount = writingMapper.increaseView(writingUuid);
         if(successCount < 1){
             throw new FastRequestException();
+        }
+
+        String authorUuid = writingMapper.getAuthorUuidByUuid(writingUuid);
+        successCount = userMapper.updateTotalViewDelta(authorUuid, 1);
+        if(successCount < 1){
+            throw new FastRequestException();
+        }
+    }
+
+    //글 삭제
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteWriting(String uuid){
+        Writing writing = writingMapper.selectWritingByUuid(uuid);
+
+        //태그 연결 제거
+        int successCount = tagMapper.deleteWritingTag(uuid);
+        if(successCount < writing.getTag().size()){
+            throw new BadRequestException("해당 글은 존재하지 않습니다. (Tag)");
+        }
+
+        String authorUuid = writing.getAuthor().getUserUuid();
+        //연결 메타데이터 감소
+        successCount = userMapper.updateTotalWritingDelta(authorUuid, -1) +
+                        userMapper.updateTotalViewDelta(authorUuid, -writing.getView()) +
+                        userMapper.updateTotalCommentDelta(authorUuid, -writing.getCommentCount()) +
+                        userMapper.updateTotalGreatDelta(authorUuid, -writing.getGreat());
+
+        if(successCount < 4){
+            throw new BadRequestException("해당 글은 존재하지 않습니다. (Meta)");
+        }
+
+        //좋아요 이력 제거
+        writingMapper.deleteAllGreat(uuid);
+
+        //댓글 전부 제거
+        writingMapper.deleteAllComment(uuid);
+
+        //북마크 이력 제거
+        writingMapper.deleteAllBookmarked(uuid);
+
+        //완전 제거
+        successCount = writingMapper.deleteWritingByUuid(uuid);
+        if(successCount < 1){
+            throw new BadRequestException("해당 글은 존재하지 않습니다. (Del)");
         }
     }
 }

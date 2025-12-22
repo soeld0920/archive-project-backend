@@ -11,6 +11,10 @@
         <result property="banner" column="banner"/>
         <result property="createAt" column="create_at"/>
         <result property="updateAt" column="update_at"/>
+        <result property="totalWriting" column="total_writing"/>
+        <result property="totalGreat" column="total_great"/>
+        <result property="totalComment" column="total_comment"/>
+        <result property="totalView" column="total_view"/>
         <association property="role" column="role_name" resultMap="roleMap"/>
     </resultMap>
 
@@ -39,7 +43,11 @@
             create_at,
             update_at,
             role_id,
-            role_name
+            role_name,
+            total_writing,
+            total_view,
+            total_great,
+            total_comment
         from
             user_info_view
         where
@@ -116,4 +124,43 @@
         )
     </select>
 
+    <update id="updateTotalViewDelta">
+        update user_info
+        set total_view = case
+            when total_view + #{delta} &lt; 0 then 0
+            else total_view + #{delta}
+        end
+        where
+            user_info_uuid = #{userUuid}
+    </update>
+
+    <update id="updateTotalGreatDelta">
+        update user_info
+        set total_great = case
+        when total_great + #{delta} &lt; 0 then 0
+        else total_great + #{delta}
+        end
+        where
+        user_info_uuid = #{userUuid}
+    </update>
+
+    <update id="updateTotalWritingDelta">
+        update user_info
+        set total_writing = case
+        when total_writing + #{delta} &lt; 0 then 0
+        else total_writing + #{delta}
+        end
+        where
+        user_info_uuid = #{userUuid}
+    </update>
+
+    <update id="updateTotalCommentDelta">
+        update user_info
+        set total_comment = case
+        when total_comment + #{delta} &lt; 0 then 0
+        else total_comment + #{delta}
+        end
+        where
+        user_info_uuid = #{userUuid}
+    </update>
 </mapper>

@@ -1,5 +1,6 @@
 package com.archive.archive_project_backend.service;
 
+import com.archive.archive_project_backend.constants.FileConstants;
 import com.archive.archive_project_backend.dto.req.SigninReqDto;
 import com.archive.archive_project_backend.dto.req.SignupReqDto;
 import com.archive.archive_project_backend.dto.res.SigninResDto;
@@ -9,6 +10,7 @@ import com.archive.archive_project_backend.entity.UserLogin;
 import com.archive.archive_project_backend.exception.login.RefreshTokenException;
 import com.archive.archive_project_backend.exception.login.SigninException;
 import com.archive.archive_project_backend.exception.login.SignupException;
+import com.archive.archive_project_backend.infra.storage.LocalFileStorage;
 import com.archive.archive_project_backend.jwt.JwtUtil;
 import com.archive.archive_project_backend.repository.RefreshTokenMapper;
 import com.archive.archive_project_backend.repository.UserMapper;
@@ -16,12 +18,14 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -29,11 +33,13 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LoginService {
     private final UserMapper userMapper;
     private final RefreshTokenMapper refreshTokenMapper;
     private final BCryptPasswordEncoder encoder;
     private final JwtUtil jwtUtil;
+    private final LocalFileStorage localFileStorage;
 
     @Value("${jwt.refresh-expire-millis}")
     private long refreshExpireMillis;
@@ -60,9 +66,14 @@ public class LoginService {
         }
     }
 
+    //banner path 생성기
+    private String generateBannerUrl(String userUuid){
+        return FileConstants.BANNER + "/" + userUuid;
+    }
+
     //회원가입
     @Transactional(rollbackFor = Exception.class)
-    public void signup(SignupReqDto dto){
+    public void signup(SignupReqDto dto) throws IOException {
         //id 중복 체크
         if(userMapper.getUserByUserid(dto.getUserid()) != null){
             throw new SignupException("이미 존재하는 아이디입니다.", HttpStatus.CONFLICT);
@@ -76,7 +87,13 @@ public class LoginService {
         //비번 암호화
         userLogin.setPasswd(encoder.encode(dto.getPasswd()));
 
-        //유저 정보 저장부터
+        //유저 정보 저장
+        //배너 이미지 저장
+        String file = dto.getBanner();
+        String dir = generateBannerUrl(uuid);
+        String newBannerUrl = localFileStorage.moveFromTmp(file, dir);
+        user.setBanner(newBannerUrl);
+
         int successCount1 = userMapper.insertUserInfo(user);
         int successCount2 = userMapper.insertUserLogin(userLogin);
         if(successCount1 < 1 || successCount2 < 1){

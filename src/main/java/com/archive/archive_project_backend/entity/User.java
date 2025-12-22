@@ -22,4 +22,8 @@ public class User {
     private Role role;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
+    private int totalWriting;
+    private int totalView;
+    private int totalGreat;
+    private int totalComment;
 }

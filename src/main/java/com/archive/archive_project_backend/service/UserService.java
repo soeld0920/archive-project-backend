@@ -44,12 +44,6 @@ public class UserService {
             return null;
         }
 
-        return FindUserResDto.builder()
-                .userUuid(user.getUserUuid())
-                .userName(user.getName())
-                .bio(user.getBio())
-                .banner(user.getBanner())
-                .roleName(user.getRole().getRoleName())
-                .build();
+        return FindUserResDto.from(user);
     }
 }

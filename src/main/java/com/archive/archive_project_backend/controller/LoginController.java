@@ -15,6 +15,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -41,7 +43,7 @@ public class LoginController {
     @PostMapping("/signup")
     public ResponseEntity<String> signup(
             @RequestBody @Valid SignupReqDto dto
-    ){
+    ) throws IOException {
         loginService.signup(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body("회원가입에 성공하였습니다.");
     }

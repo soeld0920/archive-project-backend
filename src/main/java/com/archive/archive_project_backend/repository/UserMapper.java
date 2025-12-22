@@ -22,4 +22,22 @@ public interface UserMapper {
 
     //존재 여부 반환
     public boolean existsUserByUuid(String uuid);
+
+    //메타데이터 변환
+    public int updateTotalViewDelta(
+            @Param("userUuid") String uuid,
+            @Param("delta")int delta
+    );
+    public int updateTotalGreatDelta(
+            @Param("userUuid") String uuid,
+            @Param("delta")int delta
+    );
+    public int updateTotalWritingDelta(
+            @Param("userUuid") String uuid,
+            @Param("delta")int delta
+    );
+    public int updateTotalCommentDelta(
+            @Param("userUuid") String uuid,
+            @Param("delta")int delta
+    );
 }

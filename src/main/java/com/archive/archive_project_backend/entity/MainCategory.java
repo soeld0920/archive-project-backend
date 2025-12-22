@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class Category {
-    private int categoryId;
-    private MainCategory mainCategory;
-    private String subCategory;
+public class MainCategory {
+    private int mainCategoryId;
+    private String mainCategory;
 }

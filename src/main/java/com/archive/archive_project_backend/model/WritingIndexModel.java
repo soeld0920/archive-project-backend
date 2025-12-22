@@ -1,6 +1,8 @@
 package com.archive.archive_project_backend.model;
 
 import com.archive.archive_project_backend.entity.Tag;
+import com.archive.archive_project_backend.entity.Writing;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,5 +32,9 @@ public class WritingIndexModel {
     private String image;
     private String content;
 
+    public static WritingIndexModel from(Writing w, ObjectMapper om){
 
+
+         return WritingIndexModel.builder().build();
+    }
 }

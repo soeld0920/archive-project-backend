@@ -10,7 +10,15 @@ spring:
       on-profile: common # 이 블록은 common 프로필
   application:
     name: spring-boot-study
+  servlet:
+    multipart:
+      max-file-size : 3MB
+      max-request-size : 3MB
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml #mapper의 경로 지정
   type-aliases-package: com.archive.archive_project_backend.entity #entity의 경로 지정
+
+app:
+  upload:
+    root: C:\Users\User\Documents\archive_project\archive-project-image

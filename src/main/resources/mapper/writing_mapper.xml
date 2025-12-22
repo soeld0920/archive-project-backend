@@ -15,8 +15,10 @@
     </resultMap>
 
     <resultMap id="category" type="com.archive.archive_project_backend.entity.Category">
-        <result property="mainCategory" column="main_category_name"/>
         <result property="subCategory" column="category_name"/>
+        <association property="mainCategory" javaType="com.archive.archive_project_backend.entity.MainCategory">
+            <result property="mainCategory" column="main_category_name"/>
+        </association>
     </resultMap>
 
     <resultMap id="writingMap" type="com.archive.archive_project_backend.entity.Writing">
@@ -41,10 +43,10 @@
 
     <insert id="insertWriting">
         insert into
-            writing(writing_uuid, writing_title, writing_content, series_uuid, author_uuid, category_id, create_at, update_at)
+            writing(writing_uuid, writing_title, writing_content, series_uuid, series_order, author_uuid, category_id, create_at, update_at)
         values
-            (#{writingUuid}, #{title},#{content},#{series.seriesUuid},#{author.userUuid},
-            #{category.categoryId},now(),now())
+            (#{writing.writingUuid}, #{writing.title},#{writing.content},#{writing.series.seriesUuid},#{writing.seriesOrder},#{writing.author.userUuid},
+            #{writing.category.categoryId},now(),now())
     </insert>
 
     <select id="selectWritingByUuid" resultMap="writingMap">
@@ -65,6 +67,15 @@
             series_title
         from
             writing_view
+        where
+            writing_uuid = #{uuid}
+    </select>
+
+    <select id="getAuthorUuidByUuid" resultType="string">
+        select
+            author_uuid
+        from
+            writing
         where
             writing_uuid = #{uuid}
     </select>
@@ -119,6 +130,13 @@
             writing_uuid = #{writingUuid}
     </delete>
 
+    <delete id="deleteAllGreat">
+        delete from
+            great
+        where
+            writing_uuid = #{writingUuid}
+    </delete>
+
     <insert id="insertBookmarked">
         insert into
             bookmark(writing_uuid, user_info_uuid)
@@ -133,6 +151,14 @@
             user_info_uuid = #{userUuid} and
             writing_uuid = #{writingUuid}
     </delete>
+
+    <delete id="deleteAllBookmarked">
+        delete from
+        bookmark
+        where
+        writing_uuid = #{uuid}
+    </delete>
+
 
     <update id="increaseGreat">
         UPDATE writing
@@ -157,5 +183,19 @@
         SET view = view - 1
         WHERE writing_uuid = #{writingUuid}
     </update>
+
+    <delete id="deleteAllComment">
+        delete from
+            comment
+        WHERE writing_uuid = #{uuid}
+    </delete>
+
+    <delete id="deleteWritingByUuid">
+        delete from
+            writing
+        where
+            writing_uuid = #{uuid}
+    </delete>
+
 
 </mapper>

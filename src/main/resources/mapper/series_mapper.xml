@@ -19,8 +19,6 @@
         <!-- Writing 목록 -->
         <collection property="writings" ofType="com.archive.archive_project_backend.entity.Writing">
             <id property="writingUuid" column="writing_uuid"/>
-            <result property="title" column="writing_title"/>
-            <result property="content" column="writing_content"/>
             <result property="seriesOrder" column="series_order"/>
         </collection>
     </resultMap>
@@ -44,8 +42,6 @@
 
             -- Writing
             w.writing_uuid,
-            w.writing_title,
-            w.writing_content,
             w.series_order
 
         FROM series s
@@ -65,4 +61,13 @@
         values
             (#{seriesUuid}, #{authorUuid}, #{title}, #{category.categoryId}, now(), now())
     </insert>
+
+    <select id="getNextSeriesOrder" resultType="int">
+        select
+        max(series_order) + 1
+        from
+        writing_view
+        where
+        series_uuid = #{uuid}
+    </select>
 </mapper>

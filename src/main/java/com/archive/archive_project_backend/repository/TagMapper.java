@@ -19,4 +19,6 @@ public interface TagMapper {
             );
 
     public List<Tag> selectTagsByWritingUuid(String writingUuid);
+
+    public int deleteWritingTag(String writingUuid);
 }

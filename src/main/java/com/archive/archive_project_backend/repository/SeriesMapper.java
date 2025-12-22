@@ -10,4 +10,6 @@ public interface SeriesMapper {
     public Series getSeriesByUuid(String uuid);
 
     public int insertSeries(Series series);
+    //다음 시리즈 반환
+    public int getNextSeriesOrder(String uuid);
 }
