@@ -25,9 +25,6 @@ public class SearchController {
             @RequestBody SearchReqDto dto
             ){
         List<WritingIndexModel> writingIndexes = searchService.searchWriting(dto);
-        if(writingIndexes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(writingIndexes);
-        }
         return ResponseEntity.ok(writingIndexes);
     }
 

@@ -93,6 +93,7 @@ public class WritingController {
     public ResponseEntity<Void> increaseView(
             @PathVariable String writingUuid
     ){
+        log.info(writingUuid);
         writingService.increaseView(writingUuid);
         return ResponseEntity.noContent().build();
     }
