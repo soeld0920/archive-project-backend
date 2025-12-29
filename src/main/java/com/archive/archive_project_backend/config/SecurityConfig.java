@@ -83,6 +83,7 @@ public class SecurityConfig {
             auth.requestMatchers(HttpMethod.PUT,"/api/writing/*/great").authenticated();
             auth.requestMatchers(HttpMethod.PUT,"/api/writing/*/bookmark").authenticated();
             auth.requestMatchers(HttpMethod.POST,"/api/writing").authenticated();
+            auth.requestMatchers(HttpMethod.GET,"/api/textStyle/**").authenticated();
             auth.anyRequest().permitAll();
         });
 

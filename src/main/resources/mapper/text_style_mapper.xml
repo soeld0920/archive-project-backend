@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.archive.archive_project_backend.repository.TextStyleMapper">
+    <resultMap id="textStyleMap" type="com.archive.archive_project_backend.entity.textStyle.TextStyle">
+        <id property="id" column="text_style_id"/>
+        <result property="name" column="text_style_name"/>
+        <result property="size" column="text_style_size"/>
+        <result property="bold" column="text_style_bold"/>
+        <result property="italic" column="text_style_italic"/>
+        <result property="underline" column="text_style_underline"/>
+        <result property="strikeout" column="text_style_strikeout"/>
+        <result property="color" column="text_style_color"/>
+        <result property="highlight" column="text_style_highlight"/>
+        <result property="align" column="text_style_align"/>
+        <result property="createAt" column="create_at"/>
+        <result property="updateAt" column="update_at"/>
+        <association property="font" resultMap="fontMap"/>
+        <association property="role" resultMap="roleMap"/>
+    </resultMap>
+
+    <resultMap id="fontMap" type="com.archive.archive_project_backend.entity.textStyle.FontFamily">
+        <id property="id" column="font_family_id"/>
+        <result property="name" column="font_family_name"/>
+        <result property="key" column="font_family_key"/>
+    </resultMap>
+
+    <resultMap id="roleMap" type="com.archive.archive_project_backend.entity.textStyle.TextRole">
+        <id property="code" column="role_code"/>
+        <result property="name" column="role_name"/>
+    </resultMap>
+
+<!--    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+    <select id="selectTextStylesByUuid" resultMap="textStyleMap">
+        select
+          text_style_id,
+          user_info_uuid,
+
+          text_style_name,
+          text_style_size,
+
+          font_family_id,
+          font_family_name,
+          font_family_key,
+
+          role_code,
+          role_name,
+
+          text_style_bold,
+          text_style_italic,
+          text_style_underline,
+          text_style_strikeout,
+
+          text_style_color,
+          text_style_highlight,
+
+          text_style_align
+        from
+            text_style_view
+        where
+            user_info_uuid is null or user_info_uuid = #{uuid}
+    </select>
+
+    <select id="selectTextStyleByUuid" resultMap="textStyleMap">
+        select
+        text_style_id,
+        user_info_uuid,
+
+        text_style_name,
+        text_style_size,
+
+        font_family_id,
+        font_family_name,
+        font_family_key,
+
+        role_code,
+        role_name,
+
+        text_style_bold,
+        text_style_italic,
+        text_style_underline,
+        text_style_strikeout,
+
+        text_style_color,
+        text_style_highlight,
+
+        text_style_align
+        from
+        text_style_view
+        where
+        user_info_uuid is null or user_info_uuid = #{uuid}
+        limit 1
+    </select>
+
+    <select id="getAllTextRoles" resultMap="roleMap">
+        select
+            role_code,
+            role_name
+        from
+            text_role
+    </select>
+
+    <select id="getAllFontFamily" resultMap="fontMap">
+        select
+            font_family_id,
+            font_family_name,
+            font_family_key
+        from
+            font_family
+    </select>
+</mapper>
