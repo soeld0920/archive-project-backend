@@ -52,7 +52,35 @@
         LEFT JOIN writing w
             ON s.series_uuid = w.series_uuid
 
-        WHERE s.series_uuid = #{seriesUuid}
+        WHERE s.series_uuid = #{uuid}
+    </select>
+
+    <select id="getSeriesByUserUuid" resultMap="seriesMap">
+        select
+        -- Series
+        s.series_uuid,
+        s.series_title,
+        s.author_uuid      AS series_author_uuid,
+        s.view             AS series_view,
+        s.create_at        AS series_create_at,
+        s.update_at        AS series_update_at,
+
+        -- Series Category
+        c.category_id,
+
+        -- Writing
+        w.writing_uuid,
+        w.series_order
+
+        FROM series s
+        LEFT JOIN category c
+        ON s.category_id = c.category_id
+        LEFT JOIN main_category mc
+        ON mc.main_category_id = c.main_category_id
+        LEFT JOIN writing w
+        ON s.series_uuid = w.series_uuid
+
+        WHERE s.author_uuid = #{userUuid}
     </select>
 
     <insert id="insertSeries">

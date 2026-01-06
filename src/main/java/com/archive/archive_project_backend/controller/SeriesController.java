@@ -1,6 +1,7 @@
 package com.archive.archive_project_backend.controller;
 
 import com.archive.archive_project_backend.dto.req.AddSeriesReqDto;
+import com.archive.archive_project_backend.dto.res.SeriesIndexResDto;
 import com.archive.archive_project_backend.jwt.JwtAuthentication;
 import com.archive.archive_project_backend.model.SeriesNavigationModel;
 import com.archive.archive_project_backend.service.SeriesService;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,5 +39,14 @@ public class SeriesController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(model);
+    }
+
+    @GetMapping("/me/index")
+    public ResponseEntity<List<SeriesIndexResDto>> getSeriesIndexes(
+            @AuthenticationPrincipal JwtAuthentication auth
+    ){
+        String uuid = auth.getPrincipal();
+        List<SeriesIndexResDto> resDtos = seriesService.getSeriesIndexByUserUuid(uuid);
+        return ResponseEntity.ok(resDtos);
     }
 }

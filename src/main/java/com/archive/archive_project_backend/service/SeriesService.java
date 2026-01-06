@@ -1,6 +1,7 @@
 package com.archive.archive_project_backend.service;
 
 import com.archive.archive_project_backend.dto.req.AddSeriesReqDto;
+import com.archive.archive_project_backend.dto.res.SeriesIndexResDto;
 import com.archive.archive_project_backend.entity.Series;
 import com.archive.archive_project_backend.entity.User;
 import com.archive.archive_project_backend.entity.Writing;
@@ -83,5 +84,10 @@ public class SeriesService {
         }
 
         return builder.build();
+    }
+
+    public List<SeriesIndexResDto> getSeriesIndexByUserUuid(String uuid){
+        List<Series> series = seriesMapper.getSeriesByUserUuid(uuid);
+        return series.stream().map(SeriesIndexResDto::from).toList();
     }
 }

@@ -21,4 +21,4 @@ mybatis:
 
 app:
   upload:
-    root: C:\Users\User\Documents\archive_project\archive-project-image
+    root: ${UPLOAD_ROOT}
