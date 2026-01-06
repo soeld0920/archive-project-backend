@@ -3,6 +3,7 @@ package com.archive.archive_project_backend.repository;
 import com.archive.archive_project_backend.entity.Writing;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Mapper
 public interface WritingMapper {
@@ -80,4 +81,13 @@ public interface WritingMapper {
 
     //댓글 전부 제거
     int deleteAllComment(String uuid);
+
+    //변경
+    int updateCategory(@Param("writingUuid") String writingUuid, @Param("categoryId") int categoryId);
+    int updateContent(@Param("writingUuid") String writingUuid, @Param("content") String content);
+    int updateTitle(@Param("writingUuid") String writingUuid, @Param("title") String title);
+    int updateSeries(@Param("writingUuid") String writingUuid, @Param("seriesUuid") String seriesUuid);
+
+    //series_order 변경
+    int reorderSeriesOrder(@Param("seriesUuid") String seriesUuid, @Param("startOrder") int startOrder);
 }

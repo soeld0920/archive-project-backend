@@ -80,10 +80,12 @@ public class SecurityConfig {
         //url 권한 설정
         http.authorizeHttpRequests(auth -> {
             auth.requestMatchers(HttpMethod.POST,"/api/writing/*/comment").authenticated();
-            auth.requestMatchers(HttpMethod.PUT,"/api/writing/*/great").authenticated();
-            auth.requestMatchers(HttpMethod.PUT,"/api/writing/*/bookmark").authenticated();
             auth.requestMatchers(HttpMethod.POST,"/api/writing").authenticated();
             auth.requestMatchers(HttpMethod.GET,"/api/textStyle/**").authenticated();
+            auth.requestMatchers(HttpMethod.GET,"/api/user/me").authenticated();
+            auth.requestMatchers(HttpMethod.DELETE).authenticated();
+            auth.requestMatchers(HttpMethod.PATCH).authenticated();
+            auth.requestMatchers(HttpMethod.PUT).authenticated();
             auth.anyRequest().permitAll();
         });
 

@@ -2,6 +2,7 @@ package com.archive.archive_project_backend.controller;
 
 import com.archive.archive_project_backend.dto.req.AddWritingReqDto;
 import com.archive.archive_project_backend.dto.req.FindWritingReqDto;
+import com.archive.archive_project_backend.dto.req.PatchWritingReqDto;
 import com.archive.archive_project_backend.dto.req.ToggleReqDto;
 import com.archive.archive_project_backend.dto.res.FindWritingResDto;
 import com.archive.archive_project_backend.dto.res.WritingInteractionStateResDto;
@@ -100,9 +101,20 @@ public class WritingController {
 
     @DeleteMapping("/{writingUuid}")
     public ResponseEntity<Void> deleteWriting(
-            @PathVariable String writingUuid
+            @PathVariable String writingUuid,
+            @AuthenticationPrincipal JwtAuthentication auth
     ){
-        writingService.deleteWriting(writingUuid);
+        writingService.deleteWriting(writingUuid, auth.getPrincipal());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping("/{writingUuid}")
+    public ResponseEntity<Void> patchWriting(
+            @PathVariable String writingUuid,
+            @RequestBody PatchWritingReqDto dto,
+            @AuthenticationPrincipal JwtAuthentication auth
+    ){
+        String userUuid = auth.getPrincipal();
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

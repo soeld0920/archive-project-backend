@@ -197,5 +197,35 @@
             writing_uuid = #{uuid}
     </delete>
 
+    <update id="updateCategory">
+        update writing
+        set category_id = #{categoryId}
+        where writing_uuid = #{writingUuid}
+    </update>
 
+    <update id="updateContent">
+        update writing
+        set content = #{content}
+        where writing_uuid = #{writingUuid}
+    </update>
+
+    <update id="updateTitle">
+        update writing
+        set title = #{title}
+        where writing_uuid = #{writingUuid}
+    </update>
+
+    <update id="updateSeries">
+        update writing
+        set series_uuid = #{seriesUuid}
+        where writing_uuid = #{writingUuid}
+    </update>
+
+    <update id="reorderSeriesOrder">
+        update writing
+        set series_order = series_order - 1
+        where
+            series_uuid = #{seriesUuid} and
+            series_order &gt;= #{startOrder}
+    </update>
 </mapper>

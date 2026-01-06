@@ -230,11 +230,15 @@ public class WritingService {
 
     //글 삭제
     @Transactional(rollbackFor = Exception.class)
-    public void deleteWriting(String uuid){
-        Writing writing = writingMapper.selectWritingByUuid(uuid);
+    public void deleteWriting(String writingUuid, String userUuid){
+        Writing writing = writingMapper.selectWritingByUuid(writingUuid);
+
+        if(!userUuid.equals(writing.getAuthor().getUserUuid())){
+            throw new BadRequestException("작성자가 아닙니다.");
+        }
 
         //태그 연결 제거
-        int successCount = tagMapper.deleteWritingTag(uuid);
+        int successCount = tagMapper.deleteWritingTag(writingUuid);
         if(successCount < writing.getTag().size()){
             throw new BadRequestException("해당 글은 존재하지 않습니다. (Tag)");
         }
@@ -251,16 +255,16 @@ public class WritingService {
         }
 
         //좋아요 이력 제거
-        writingMapper.deleteAllGreat(uuid);
+        writingMapper.deleteAllGreat(writingUuid);
 
         //댓글 전부 제거
-        writingMapper.deleteAllComment(uuid);
+        writingMapper.deleteAllComment(writingUuid);
 
         //북마크 이력 제거
-        writingMapper.deleteAllBookmarked(uuid);
+        writingMapper.deleteAllBookmarked(writingUuid);
 
         //완전 제거
-        successCount = writingMapper.deleteWritingByUuid(uuid);
+        successCount = writingMapper.deleteWritingByUuid(writingUuid);
         if(successCount < 1){
             throw new BadRequestException("해당 글은 존재하지 않습니다. (Del)");
         }
