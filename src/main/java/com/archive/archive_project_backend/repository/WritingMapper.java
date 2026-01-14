@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
+
 @Mapper
 public interface WritingMapper {
 
@@ -18,6 +20,12 @@ public interface WritingMapper {
 
     //authorUuid 찾기
     String getAuthorUuidByUuid(String uuid);
+
+    //시리즈 글들 반환
+    List<Writing> selectWritingBySeriesUuid(String uuid);
+
+    //List<String> -> List<Writing>
+    List<Writing> selectWritingsByStrings(List<String> writingUuidList);
 
     //좋아요 여부 및 북마크 여부 반환
     boolean getGreatedByUuids(
@@ -86,8 +94,13 @@ public interface WritingMapper {
     int updateCategory(@Param("writingUuid") String writingUuid, @Param("categoryId") int categoryId);
     int updateContent(@Param("writingUuid") String writingUuid, @Param("content") String content);
     int updateTitle(@Param("writingUuid") String writingUuid, @Param("title") String title);
-    int updateSeries(@Param("writingUuid") String writingUuid, @Param("seriesUuid") String seriesUuid);
-
+    int updateSeries(@Param("writingUuid") String writingUuid, @Param("seriesUuid") String seriesUuid, @Param("seriesOrder") Integer seriesOrder);
+    int updateTime(@Param("writingUuid") String writingUuid);
     //series_order 변경
     int reorderSeriesOrder(@Param("seriesUuid") String seriesUuid, @Param("startOrder") int startOrder);
+
+    //다중 series_order 업데이트
+    int updateSeriesOrderByList(
+            @Param("writingList") List<Writing> writingList
+    );
 }

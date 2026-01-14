@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
+@Slf4j
 public class FindWritingResDto {
     private String writingUuid;
     private String writingTitle;
@@ -25,6 +27,7 @@ public class FindWritingResDto {
     private int view;
     private int great;
     private int commentCount;
+    private int categoryId;
     private String mainCategoryName;
     private String subCategoryName;
     private String authorUuid;
@@ -53,7 +56,6 @@ public class FindWritingResDto {
             // 2) 또는 예외 던지기(권장: 데이터가 항상 정상이어야 한다면)
             // throw new IllegalArgumentException("Invalid JSON in writing.content", e);
         }
-
         return FindWritingResDto.builder()
                 .writingUuid(writing.getWritingUuid())
                 .writingTitle(writing.getTitle())
@@ -61,6 +63,7 @@ public class FindWritingResDto {
                 .view(writing.getView())
                 .great(writing.getGreat())
                 .commentCount(writing.getCommentCount())
+                .categoryId(writing.getCategory().getCategoryId())
                 .mainCategoryName(writing.getCategory().getMainCategory().getMainCategory())
                 .subCategoryName(writing.getCategory().getSubCategory())
                 .authorUuid(author != null ? author.getUserUuid() : null)

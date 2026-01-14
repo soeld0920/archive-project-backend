@@ -4,6 +4,7 @@ import com.archive.archive_project_backend.entity.textStyle.FontFamily;
 import com.archive.archive_project_backend.entity.textStyle.TextRole;
 import com.archive.archive_project_backend.entity.textStyle.TextStyle;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -14,4 +15,9 @@ public interface TextStyleMapper {
     TextStyle selectTextStyleByUuid(String uuid);
     List<TextRole> getAllTextRoles();
     List<FontFamily> getAllFontFamily();
+
+    int insertTextStyle(
+            @Param("userUuid") String userUuid,
+            @Param("textStyle") TextStyle textStyle
+    );
 }

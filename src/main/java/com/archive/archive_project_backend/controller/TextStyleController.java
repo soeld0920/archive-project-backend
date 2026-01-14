@@ -1,15 +1,19 @@
 package com.archive.archive_project_backend.controller;
 
+import com.archive.archive_project_backend.dto.req.AddTextStyleReqDto;
 import com.archive.archive_project_backend.dto.res.FontFamilyResDto;
 import com.archive.archive_project_backend.dto.res.TextRoleResDto;
 import com.archive.archive_project_backend.dto.res.TextStyleResDto;
 import com.archive.archive_project_backend.jwt.JwtAuthentication;
 import com.archive.archive_project_backend.service.TextStyleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -46,6 +50,15 @@ public class TextStyleController {
     public ResponseEntity<List<TextRoleResDto>> getTextRoles(){
         List<TextRoleResDto> res = textStyleService.getTextRoles();
         return ResponseEntity.ok(res);
+    }
+
+    @PostMapping("")
+    public ResponseEntity<Void> addTextStyle(
+            @AuthenticationPrincipal JwtAuthentication auth,
+            @RequestBody AddTextStyleReqDto reqDto
+            ){
+        textStyleService.addTextStyle(reqDto,auth.getPrincipal());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 }

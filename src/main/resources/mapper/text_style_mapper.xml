@@ -109,4 +109,39 @@
         from
             font_family
     </select>
+
+    <insert id="insertTextStyle">
+        insert into text_style (
+            user_info_uuid,
+            text_style_name,
+            text_style_size,
+            text_style_font_id,
+            text_style_role_code,
+            text_style_bold,
+            text_style_italic,
+            text_style_underline,
+            text_style_strikeout,
+            text_style_color,
+            text_style_highlight,
+            text_style_align,
+            create_at,
+            update_at
+        )
+        values (
+            #{userUuid},
+            #{textStyle.name},
+            #{textStyle.size},
+            #{textStyle.font.id},
+            #{textStyle.role.code},
+            #{textStyle.bold},
+            #{textStyle.italic},
+            #{textStyle.underline},
+            #{textStyle.strikeout},
+            #{textStyle.color},
+            #{textStyle.highlight},
+            #{textStyle.align},
+            now(),
+            now()
+        )
+    </insert>
 </mapper>

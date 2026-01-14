@@ -16,6 +16,7 @@ public class FindUserResDto {
     private String bio;
     private String banner;
     private String roleName;
+    private String email;
     private int totalWriting;
     private int totalView;
     private int totalGreat;
@@ -28,6 +29,7 @@ public class FindUserResDto {
                 .bio(user.getBio())
                 .banner(user.getBanner())
                 .roleName(user.getRole().getRoleName())
+                .email(user.getEmail())
                 .totalWriting(user.getTotalWriting())
                 .totalView(user.getTotalView())
                 .totalGreat(user.getTotalGreat())

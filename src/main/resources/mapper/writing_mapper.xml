@@ -15,8 +15,10 @@
     </resultMap>
 
     <resultMap id="category" type="com.archive.archive_project_backend.entity.Category">
+        <id property="categoryId" column="category_id"/>
         <result property="subCategory" column="category_name"/>
         <association property="mainCategory" javaType="com.archive.archive_project_backend.entity.MainCategory">
+            <id property="mainCategoryId" column="main_category_id"/>
             <result property="mainCategory" column="main_category_name"/>
         </association>
     </resultMap>
@@ -57,8 +59,11 @@
             view,
             great,
             comment_count,
+            series_order,
             create_at,
             update_at,
+            category_id,
+            main_category_id,
             main_category_name,
             category_name,
             author_uuid,
@@ -78,6 +83,59 @@
             writing
         where
             writing_uuid = #{uuid}
+    </select>
+
+    <select id="selectWritingBySeriesUuid" resultMap="writingMap">
+        select
+            writing_uuid,
+            writing_title,
+            writing_content,
+            view,
+            great,
+            comment_count,
+            series_order,
+            create_at,
+            update_at,
+            category_id,
+            main_category_id,
+            main_category_name,
+            category_name,
+            author_uuid,
+            author_name,
+            series_uuid,
+            series_title
+        from
+            writing_view
+        where
+            series_uuid = #{uuid}
+    </select>
+
+    <select id="selectWritingsByStrings" resultMap="writingMap">
+        select
+            writing_uuid,
+            writing_title,
+            writing_content,
+            view,
+            great,
+            comment_count,
+            series_order,
+            create_at,
+            update_at,
+            category_id,
+            main_category_id,
+            main_category_name,
+            category_name,
+            author_uuid,
+            author_name,
+            series_uuid,
+            series_title
+        from
+            writing_view
+        where
+            writing_uuid in
+            <foreach collection="writingUuidList" item="uuid" open="(" close=")" separator=",">
+                #{uuid}
+            </foreach>
     </select>
 
     <select id="getGreatedByUuids" resultType="boolean">
@@ -205,19 +263,20 @@
 
     <update id="updateContent">
         update writing
-        set content = #{content}
+        set writing_content = #{content}
         where writing_uuid = #{writingUuid}
     </update>
 
     <update id="updateTitle">
         update writing
-        set title = #{title}
+        set writing_title = #{title}
         where writing_uuid = #{writingUuid}
     </update>
 
     <update id="updateSeries">
         update writing
         set series_uuid = #{seriesUuid}
+        <if test="seriesOrder != null">, series_order = #{seriesOrder}</if>
         where writing_uuid = #{writingUuid}
     </update>
 
@@ -227,5 +286,26 @@
         where
             series_uuid = #{seriesUuid} and
             series_order &gt;= #{startOrder}
+    </update>
+
+    <update id="updateTime">
+        update writing
+        set update_at = now()
+        where writing_uuid = #{writingUuid}
+    </update>
+
+    <update id="updateSeriesOrderByList">
+        update writing
+        set series_order = case writing_uuid
+            <foreach collection="writingList" index="i" item="writing">
+                when #{writing.writingUuid} then #{i} + 1
+            </foreach>
+            else 0
+        end
+        where
+            writing_uuid in
+            <foreach collection="writingList" item="writing" open="(" close=")" separator=",">
+                #{writing.writingUuid}
+            </foreach>
     </update>
 </mapper>

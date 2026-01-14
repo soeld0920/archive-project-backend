@@ -1,6 +1,7 @@
 package com.archive.archive_project_backend.service;
 
 import com.archive.archive_project_backend.dto.res.CategoryResDto;
+import com.archive.archive_project_backend.dto.res.FindCategoryResDto;
 import com.archive.archive_project_backend.entity.Category;
 import com.archive.archive_project_backend.entity.MainCategory;
 import com.archive.archive_project_backend.exception.NotFoundException;
@@ -30,5 +31,10 @@ public class CategoryService {
             throw new NotFoundException("서브 카테고리를 찾지 못했습니다.");
         }
         return categories.stream().map(CategoryResDto::from).toList();
+    }
+
+    public FindCategoryResDto getDetailCategory(int id){
+        Category category = categoryMapper.getCategoryById(id);
+        return FindCategoryResDto.from(category);
     }
 }

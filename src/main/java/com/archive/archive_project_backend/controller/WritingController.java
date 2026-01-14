@@ -1,12 +1,10 @@
 package com.archive.archive_project_backend.controller;
 
-import com.archive.archive_project_backend.dto.req.AddWritingReqDto;
-import com.archive.archive_project_backend.dto.req.FindWritingReqDto;
-import com.archive.archive_project_backend.dto.req.PatchWritingReqDto;
-import com.archive.archive_project_backend.dto.req.ToggleReqDto;
+import com.archive.archive_project_backend.dto.req.*;
 import com.archive.archive_project_backend.dto.res.FindWritingResDto;
 import com.archive.archive_project_backend.dto.res.WritingInteractionStateResDto;
 import com.archive.archive_project_backend.jwt.JwtAuthentication;
+import com.archive.archive_project_backend.model.WritingIndexModel;
 import com.archive.archive_project_backend.service.writing.WritingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,6 +55,12 @@ public class WritingController {
         String userUuid = getJwtAuthenticationPrincipal(auth);
         WritingInteractionStateResDto dto = writingService.getWritingInteractionState(writingUuid, userUuid);
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/bySeries/{seriesUuid}")
+    public ResponseEntity<List<WritingIndexModel>> getWritingIndexBySeriesIndex(@PathVariable String seriesUuid){
+        List<WritingIndexModel> res = writingService.getWritingIndexBySeriesUuid(seriesUuid);
+        return ResponseEntity.ok(res);
     }
 
     @PutMapping("/{writingUuid}/great")
@@ -113,8 +118,18 @@ public class WritingController {
             @PathVariable String writingUuid,
             @RequestBody PatchWritingReqDto dto,
             @AuthenticationPrincipal JwtAuthentication auth
-    ){
+    ) throws IOException {
         String userUuid = auth.getPrincipal();
-        return ResponseEntity.status(HttpStatus.OK).build();
+        writingService.patchWriting(writingUuid, userUuid, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PatchMapping("/seriesOrder/{seriesUuid}")
+    public ResponseEntity<Void> patchSeriesOrder(
+            @PathVariable String seriesUuid,
+            @RequestBody List<PatchSeriesOrderReqDto> dtos
+            ){
+        writingService.patchSeriesOrder(seriesUuid, dtos);
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,6 +1,7 @@
 package com.archive.archive_project_backend.controller;
 
 import com.archive.archive_project_backend.dto.res.CategoryResDto;
+import com.archive.archive_project_backend.dto.res.FindCategoryResDto;
 import com.archive.archive_project_backend.entity.MainCategory;
 import com.archive.archive_project_backend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,11 @@ public class CategoryController {
     public ResponseEntity<List<CategoryResDto>> getCategories(@PathVariable int id){
         List<CategoryResDto> res = categoryService.getCategories(id);
         return ResponseEntity.ok(res);
+    }
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<FindCategoryResDto> getDetailCategory(@PathVariable int id){
+        FindCategoryResDto dto = categoryService.getDetailCategory(id);
+        return ResponseEntity.ok(dto);
     }
 }

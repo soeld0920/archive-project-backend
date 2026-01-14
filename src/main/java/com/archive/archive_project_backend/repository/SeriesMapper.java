@@ -15,5 +15,5 @@ public interface SeriesMapper {
 
     public int insertSeries(Series series);
     //다음 시리즈 순서 반환
-    public int getNextSeriesOrder(String uuid);
+    public Integer getNextSeriesOrder(String uuid);
 }

@@ -1,17 +1,23 @@
 package com.archive.archive_project_backend.service.writing;
 
 import com.archive.archive_project_backend.constants.FileConstants;
+import com.archive.archive_project_backend.constants.WritingConstants;
 import com.archive.archive_project_backend.dto.req.AddWritingReqDto;
 import com.archive.archive_project_backend.dto.req.FindWritingReqDto;
+import com.archive.archive_project_backend.dto.req.PatchSeriesOrderReqDto;
+import com.archive.archive_project_backend.dto.req.PatchWritingReqDto;
 import com.archive.archive_project_backend.dto.res.FindWritingResDto;
 import com.archive.archive_project_backend.dto.res.WritingInteractionStateResDto;
 import com.archive.archive_project_backend.entity.*;
 import com.archive.archive_project_backend.exception.FastRequestException;
+import com.archive.archive_project_backend.exception.add.AddException;
 import com.archive.archive_project_backend.exception.add.AddTagException;
 import com.archive.archive_project_backend.exception.add.AddWritingException;
 import com.archive.archive_project_backend.exception.BadRequestException;
 import com.archive.archive_project_backend.exception.FindWritingException;
+import com.archive.archive_project_backend.model.WritingIndexModel;
 import com.archive.archive_project_backend.repository.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +39,23 @@ public class WritingService {
     private final TagMapper tagMapper;
     private final ObjectMapper objectMapper;
     private final WritingContentImageMigrator writingContentImageMigrator;
+
+    //List<String> tag만으로 글과 태그를 연결
+    @Transactional(rollbackFor = Exception.class)
+    private void connectWritingTag(Writing writing, List<String> tag){
+        //태그 추가
+        tagMapper.insertTags(Tag.asStrings(tag));
+
+        //id 얻어오기
+        List<Tag> tags = tagMapper.getTagsByTagNames(Tag.asStrings(tag));
+
+        //이를 연결함
+        int successCount = tagMapper.insertWritingTags(writing.getWritingUuid(), tags);
+
+        if(successCount < tags.size()){
+            throw new AddTagException();
+        }
+    }
 
 
     //단건 글 추가
@@ -74,22 +97,12 @@ public class WritingService {
             throw new AddWritingException();
         }
 
-        //태그 추가
-        tagMapper.insertTags(writing.getTag());
-
-        //id 얻어오기
-        List<Tag> tags = tagMapper.getTagsByTagNames(writing.getTag());
+        //태그 연결
+        connectWritingTag(writing, dto.getTag());
 
         //series면 다은 order 가져오기
         if(dto.getSeriesUuid() != null) {
             writing.setSeriesOrder(seriesMapper.getNextSeriesOrder(dto.getSeriesUuid()));
-        }
-
-        //이를 연결함
-        successCount = tagMapper.insertWritingTags(writing.getWritingUuid(), tags);
-
-        if(successCount < tags.size()){
-            throw new AddTagException();
         }
 
         //메타데이터 증가
@@ -117,6 +130,17 @@ public class WritingService {
         writing.setTag(tags);
 
         return FindWritingResDto.from(writing, objectMapper);
+    }
+
+    //시리즈 글 index 조회
+    public List<WritingIndexModel> getWritingIndexBySeriesUuid(String seriesUuid){
+        if(seriesMapper.getSeriesByUuid(seriesUuid) == null){
+            throw new BadRequestException("존재하지 않는 시리즈입니다.");
+        }
+
+        List<Writing> writings = writingMapper.selectWritingBySeriesUuid(seriesUuid);
+        writings.sort(Comparator.comparingInt(Writing::getSeriesOrder));
+        return writings.stream().map(WritingIndexModel::from).toList();
     }
 
     //좋아요 / 북마크 여부 반환
@@ -267,6 +291,112 @@ public class WritingService {
         successCount = writingMapper.deleteWritingByUuid(writingUuid);
         if(successCount < 1){
             throw new BadRequestException("해당 글은 존재하지 않습니다. (Del)");
+        }
+    }
+
+    //글 수정
+    @Transactional(rollbackFor = Exception.class)
+    public void patchWriting(String writingUuid, String userUuid, PatchWritingReqDto dto) throws IOException {
+        Writing writing = writingMapper.selectWritingByUuid(writingUuid);
+
+        //가드
+        if(writing == null){
+            throw new BadRequestException("존재하지 않는 글입니다.");
+        }
+        if(!writing.getAuthor().getUserUuid().equals(userUuid)){
+            throw new BadRequestException("작성자가 아닙니다.");
+        }
+
+        //수정
+
+        //카테고리
+        if(dto.getCategoryId() != null){
+            writingMapper.updateCategory(writingUuid, dto.getCategoryId());
+        }
+
+        //태그
+        if(dto.getTag() != null){
+            tagMapper.deleteWritingTag(writingUuid);
+            connectWritingTag(writing, dto.getTag());
+        }
+
+        //시리즈
+        if(dto.getSeriesUuid() != null){
+            String seriesUuid = dto.getSeriesUuid();
+
+            //기존 시리즈의 order 재정렬
+            if(writing.getSeries() != null){
+                int reorderStart = writing.getSeriesOrder() + 1;
+                writingMapper.reorderSeriesOrder(writing.getSeries().getSeriesUuid(), reorderStart);
+            }
+
+            // -> null
+            if(seriesUuid.equals(WritingConstants.NOT_SERIES)){
+                writingMapper.updateSeries(writingUuid, null, null);
+            }
+            // -> new series
+            else{
+                if(seriesMapper.getSeriesByUuid(seriesUuid) == null){
+                    throw new BadRequestException("존재하지 않는 시리즈입니다.");
+                }
+
+                //order 결정
+                Integer nextOrder = seriesMapper.getNextSeriesOrder(seriesUuid);
+                if(nextOrder == null) nextOrder = 1;
+                writingMapper.updateSeries(writingUuid, seriesUuid, nextOrder);
+
+            }
+        }
+
+        //content
+        if(dto.getContent() != null){
+            writingContentImageMigrator.migrateTmpImages(
+                    dto.getContent(),
+                    FileConstants.WRITING + "/" + writingUuid);
+            String contentJson;
+            try {
+                contentJson = objectMapper.writeValueAsString(dto.getContent());
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("content를 JSON 문자열로 변환 실패", e);
+            }
+            writingMapper.updateContent(writingUuid, contentJson);
+        }
+
+        //title
+        if(dto.getTitle() != null){
+            writingMapper.updateTitle(writingUuid, dto.getTitle());
+        }
+
+        //수정일
+        writingMapper.updateTime(writingUuid);
+    }
+
+    //글 오더 수정
+    @Transactional(rollbackFor = Exception.class)
+    public void patchSeriesOrder(String seriesUuid, List<PatchSeriesOrderReqDto> dtos){
+        List<Writing> writingList = writingMapper.selectWritingsByStrings(dtos.stream().map(PatchSeriesOrderReqDto::getWritingUuid).toList());
+
+        //가드
+        if(writingList.size() != dtos.size()){
+            throw new BadRequestException("글의 uuid 중 일치하지 않는 것이 있습니다.");
+        }
+        for(Writing w : writingList){
+            if(!w.getSeries().getSeriesUuid().equals(seriesUuid)){
+                throw new BadRequestException("글 중 시리즈와 일치하지 않는 것이 있습니다.");
+            }
+        }
+
+        //정렬
+        dtos.sort(Comparator.comparingInt(PatchSeriesOrderReqDto::getIndex));
+        List<Writing> newWritingList = new ArrayList<>();
+        for(PatchSeriesOrderReqDto dto : dtos){
+            Writing target = writingList.stream().filter(writing -> writing.getWritingUuid().equals(dto.getWritingUuid())).findFirst().get();
+            newWritingList.add(target);
+        }
+
+        int successCount = writingMapper.updateSeriesOrderByList(newWritingList);
+        if(successCount != newWritingList.size()){
+            throw new AddException("시리즈 순서 설정 중 에러가 발생했습니다");
         }
     }
 }

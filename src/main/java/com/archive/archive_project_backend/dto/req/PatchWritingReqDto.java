@@ -18,7 +18,7 @@ public class PatchWritingReqDto {
     @Size(max = 100, message = "제목은 100자 이하여야합니다.")
     private String title;
     private JsonNode content;
-    private int categoryId;
+    private Integer categoryId;
     private List<String> tag;
     private String seriesUuid;
 }
