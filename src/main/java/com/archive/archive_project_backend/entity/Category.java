@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class Category {
-    private int categoryId;
+    private Integer categoryId;
     private MainCategory mainCategory;
     private String subCategory;
 }

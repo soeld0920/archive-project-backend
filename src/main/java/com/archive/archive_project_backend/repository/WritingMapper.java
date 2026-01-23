@@ -24,6 +24,9 @@ public interface WritingMapper {
     //시리즈 글들 반환
     List<Writing> selectWritingBySeriesUuid(String uuid);
 
+    //작성한 글 반환
+    List<Writing> selectWritingByAuthorUuid(String uuid);
+
     //List<String> -> List<Writing>
     List<Writing> selectWritingsByStrings(List<String> writingUuidList);
 

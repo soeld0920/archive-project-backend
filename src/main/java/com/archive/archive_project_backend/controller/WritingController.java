@@ -58,8 +58,14 @@ public class WritingController {
     }
 
     @GetMapping("/bySeries/{seriesUuid}")
-    public ResponseEntity<List<WritingIndexModel>> getWritingIndexBySeriesIndex(@PathVariable String seriesUuid){
+    public ResponseEntity<List<WritingIndexModel>> getWritingIndexBySeriesUuid(@PathVariable String seriesUuid){
         List<WritingIndexModel> res = writingService.getWritingIndexBySeriesUuid(seriesUuid);
+        return ResponseEntity.ok(res);
+    }
+
+    @GetMapping("/byUser/{authorUuid}")
+    public ResponseEntity<List<WritingIndexModel>> getWritingIndexByAuthorUuid(@PathVariable String authorUuid){
+        List<WritingIndexModel> res = writingService.getWritingIndexByAuthorUuid(authorUuid);
         return ResponseEntity.ok(res);
     }
 
@@ -99,7 +105,6 @@ public class WritingController {
     public ResponseEntity<Void> increaseView(
             @PathVariable String writingUuid
     ){
-        log.info(writingUuid);
         writingService.increaseView(writingUuid);
         return ResponseEntity.noContent().build();
     }

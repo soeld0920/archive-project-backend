@@ -110,6 +110,31 @@
             series_uuid = #{uuid}
     </select>
 
+    <select id="selectWritingByAuthorUuid" resultMap="writingMap">
+        select
+            writing_uuid,
+            writing_title,
+            writing_content,
+            view,
+            great,
+            comment_count,
+            series_order,
+            create_at,
+            update_at,
+            category_id,
+            main_category_id,
+            main_category_name,
+            category_name,
+            author_uuid,
+            author_name,
+            series_uuid,
+            series_title
+        from
+            writing_view
+        where
+            author_uuid = #{uuid}
+    </select>
+
     <select id="selectWritingsByStrings" resultMap="writingMap">
         select
             writing_uuid,

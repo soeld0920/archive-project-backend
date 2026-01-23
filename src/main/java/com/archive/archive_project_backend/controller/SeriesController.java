@@ -1,6 +1,7 @@
 package com.archive.archive_project_backend.controller;
 
 import com.archive.archive_project_backend.dto.req.AddSeriesReqDto;
+import com.archive.archive_project_backend.dto.res.FindSeriesResDto;
 import com.archive.archive_project_backend.dto.res.SeriesIndexResDto;
 import com.archive.archive_project_backend.jwt.JwtAuthentication;
 import com.archive.archive_project_backend.model.SeriesNavigationModel;
@@ -48,5 +49,11 @@ public class SeriesController {
         String uuid = auth.getPrincipal();
         List<SeriesIndexResDto> resDtos = seriesService.getSeriesIndexByUserUuid(uuid);
         return ResponseEntity.ok(resDtos);
+    }
+
+    @GetMapping("/{seriesUuid}")
+    public ResponseEntity<FindSeriesResDto> getSeriesByUuid(@PathVariable String seriesUuid){
+        FindSeriesResDto dto = seriesService.getSeriesByUuid(seriesUuid);
+        return ResponseEntity.ok(dto);
     }
 }

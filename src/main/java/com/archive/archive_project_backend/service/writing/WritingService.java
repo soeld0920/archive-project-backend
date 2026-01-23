@@ -143,6 +143,17 @@ public class WritingService {
         return writings.stream().map(WritingIndexModel::from).toList();
     }
 
+    //작성 글 index 조회
+    public List<WritingIndexModel> getWritingIndexByAuthorUuid(String authorUuid){
+        if(userMapper.getUserByUuid(authorUuid) == null){
+            throw new BadRequestException("존재하지 않는 유저입니다.");
+        }
+
+        List<Writing> writings = writingMapper.selectWritingByAuthorUuid(authorUuid);
+        writings.sort(Comparator.comparingInt(Writing::getSeriesOrder));
+        return writings.stream().map(WritingIndexModel::from).toList();
+    }
+
     //좋아요 / 북마크 여부 반환
     @Transactional
     public WritingInteractionStateResDto getWritingInteractionState(String writingUuid, String userUuid){

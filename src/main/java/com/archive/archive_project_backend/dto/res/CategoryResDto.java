@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class CategoryResDto {
-    private int id;
+    private Integer id;
     private String name;
 
     public static CategoryResDto from(Category c){
-        return CategoryResDto.builder().id(c.getCategoryId()).name(c.getSubCategory()).build();
+        return CategoryResDto.builder().id(c != null ? c.getCategoryId() : null).name(c != null ? c.getSubCategory() : null).build();
     }
 
     public static CategoryResDto from(MainCategory c){
-        return CategoryResDto.builder().id(c.getMainCategoryId()).name(c.getMainCategory()).build();
+        return CategoryResDto.builder().id(c != null ? c.getMainCategoryId() : null).name(c.getMainCategory()).build();
     }
 }

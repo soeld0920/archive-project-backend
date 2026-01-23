@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AddSeriesReqDto {
     private String title;
-    private int categoryId;
+    private Integer categoryId;
 
     public Series toEntity(String seriesUuid, String authorUuid){
         return Series.builder().
