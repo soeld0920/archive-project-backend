@@ -25,6 +25,7 @@ public class WritingIndexModel {
     private String writingUuid;
     private String writingTitle;
     private String authorUuid;
+    private String authorImage;
     private String authorName;
     private String seriesUuid;
     private String seriesName;
@@ -89,6 +90,7 @@ public class WritingIndexModel {
                 .writingTitle(w.getTitle())
                 .authorUuid(author != null ? author.getUserUuid() : null)
                 .authorName(author != null ? author.getName() : "회원탈퇴한 유저")
+                .authorImage(author != null ? author.getBanner() : null)
                 .seriesName(series != null ? series.getTitle() : null)
                 .seriesUuid(series != null ? series.getSeriesUuid() : null)
                 .view(w.getView())

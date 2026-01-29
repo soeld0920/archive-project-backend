@@ -36,4 +36,10 @@ public class CategoryController {
         FindCategoryResDto dto = categoryService.getDetailCategory(id);
         return ResponseEntity.ok(dto);
     }
+
+    @GetMapping("/detail/main/{id}")
+    public ResponseEntity<CategoryResDto> getDetailMainCategory(@PathVariable int id){
+        CategoryResDto dto = categoryService.getDetailMainCategory(id);
+        return ResponseEntity.ok(dto);
+    }
 }

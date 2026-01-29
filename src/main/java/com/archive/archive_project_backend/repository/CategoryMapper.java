@@ -12,6 +12,9 @@ public interface CategoryMapper {
     //id로 category 얻는 함수
     public Category getCategoryById(int id);
 
+    //main id로 main-category를 얻는 함수
+    public MainCategory getMainCategoryById(int id);
+
     //메인카테고리 리스트를 반환하는 함수
     public List<MainCategory> getMainCategories();
 

@@ -37,4 +37,9 @@ public class CategoryService {
         Category category = categoryMapper.getCategoryById(id);
         return FindCategoryResDto.from(category);
     }
+
+    public CategoryResDto getDetailMainCategory(int id){
+        MainCategory mainCategory = categoryMapper.getMainCategoryById(id);
+        return CategoryResDto.from(mainCategory);
+    }
 }

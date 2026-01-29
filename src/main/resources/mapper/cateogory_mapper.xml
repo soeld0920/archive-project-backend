@@ -28,6 +28,16 @@
             category_id = #{id}
     </select>
 
+    <select id="getMainCategoryById" resultMap="categoryMap">
+        select
+            main_category_id,
+            main_category_name
+        from
+            main_category
+        where
+            main_category_id = #{id}
+    </select>
+
     <select id="getMainCategories" resultMap="mainCategoryMap">
         select
             main_category_id,
