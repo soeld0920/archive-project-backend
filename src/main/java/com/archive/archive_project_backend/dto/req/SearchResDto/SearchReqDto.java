@@ -33,7 +33,10 @@ public class SearchReqDto {
 
         String title = this.title == null || this.title.length() <= 1 ? null : this.title;
 
+        if (sortBy == null) sortBy = "";
         int sortOrderCode = SearchConstants.SORT_ORDER_CODE_MAP.getOrDefault(sortBy, 1);
+
+        if(page == null) page = 1;
 
         return WritingSearchCond.builder()
                 .mainCategoryId(this.mainCategoryId)

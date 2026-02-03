@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ViewRange{
-    private int min;
-    private int max;
+    private Integer min;
+    private Integer max;
 }

@@ -7,12 +7,14 @@ import com.archive.archive_project_backend.model.WritingSearchCond;
 import com.archive.archive_project_backend.repository.SearchMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SearchService {
     private final SearchMapper searchMapper;
     private final ObjectMapper objectMapper;
@@ -26,6 +28,7 @@ public class SearchService {
 
     public Integer searchWritingLength(SearchReqDto dto){
         WritingSearchCond cond = dto.toCond();
+        log.info(cond.toString());
         return searchMapper.searchWritingLength(cond);
     }
 }

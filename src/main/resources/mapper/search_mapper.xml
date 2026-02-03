@@ -11,6 +11,7 @@
     <resultMap id="user" type="com.archive.archive_project_backend.entity.User">
         <id property="userUuid" column="author_uuid"/>
         <result property="name" column="author_name"/>
+        <result property="banner" column="author_banner"/>
     </resultMap>
 
     <resultMap id="category" type="com.archive.archive_project_backend.entity.Category">
@@ -53,6 +54,7 @@
             category_name,
             author_uuid,
             author_name,
+            author_banner,
             series_uuid,
             series_title
         from
